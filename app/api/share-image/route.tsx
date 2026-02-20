@@ -40,9 +40,10 @@ export async function GET(req: Request) {
     // 2. URL DO PREVIEW
     // -------------------------
     const baseUrl =
-      process.env.VERCEL_URL
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      (process.env.VERCEL_URL
         ? `https://${process.env.VERCEL_URL}`
-        : "http://localhost:3000";
+        : "http://localhost:3000");
 
     const url = `${baseUrl}/share-preview?title=${encodeURIComponent(
       title
@@ -58,6 +59,11 @@ export async function GET(req: Request) {
     // 3. PEGAR ELEMENTO
     // -------------------------
     const element = await page.$("#share-card");
+
+    await page.waitForSelector("#share-card", {
+      timeout: 10000,
+      visible: true,
+    });
 
     if (!element) {
       throw new Error("Share card not found");
