@@ -6,17 +6,19 @@ export async function getBrowser() {
 
   if (isDev) {
     const puppeteerFull = await import("puppeteer");
+
     return puppeteerFull.default.launch({
       headless: true,
     });
   }
 
-  // Na Vercel
+
+  const executablePath = await chromium.executablePath();
+
   return puppeteer.launch({
     args: chromium.args,
-    // Definimos o viewport manualmente ou deixamos null para o padrão
-    defaultViewport: { width: 1280, height: 720 }, 
-    executablePath: await chromium.executablePath(),
-    headless: true, 
+    executablePath,
+    headless: true,
+    defaultViewport: { width: 1200, height: 630 },
   });
 }
