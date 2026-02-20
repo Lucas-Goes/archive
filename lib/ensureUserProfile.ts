@@ -7,61 +7,55 @@ export async function ensureUserProfile() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  console.log("USER:", user);
+  if (!user) return { error: "Usuário não autenticado." };
 
-  if (!user) return;
-
-  // verifica se já existe
+  // Verifica se o perfil já existe
   const { data: existing } = await supabase
     .from("users")
     .select("id")
     .eq("id", user.id)
     .maybeSingle();
 
-  console.log("EXISTING:", existing);
-
-  if (existing) return;
+  if (existing) return { success: true, message: "Perfil já configurado." };
 
   const searchEmail = user.email?.trim().toLowerCase() ?? '';
   
-  // busca pending
+  // Busca dados pendentes
   const { data: pending, error: pendingError } = await supabase
     .from("pending_users")
     .select("*")
     .ilike("email", searchEmail)
     .maybeSingle();
 
-  console.log("PENDING:", pending);
-  console.log("PENDING ERROR:", pendingError);
-
   if (!pending) {
-    console.log("NO PENDING USER FOUND");
-    return;
+    console.log("Nenhum dado pendente encontrado para este e-mail.");
+    return { error: "Dados de cadastro não encontrados." };
   }
 
-  // cria profile
-  const { data, error } = await supabase
-    .from("users")
-    .insert({
-      id: user.id,
-      email: user.email,
-      username: pending.username,
-      name: pending.name,
-      bio: pending.bio,
-    })
-    .select()
-    .single();
-
-  console.log("INSERT RESULT:", data);
-  console.log("INSERT ERROR:", error);
+  // Cria o perfil
+  const { error } = await supabase.from("users").insert({
+    id: user.id,
+    email: user.email,
+    username: pending.username,
+    name: pending.name,
+    bio: pending.bio,
+  });
 
   if (error) {
-    return;
+    if (error.message.includes("duplicate key")) {
+      console.log("Conflito: Nome de usuário já está em uso.");
+      return { error: "Este nome de usuário já está sendo usado. Por favor, escolha outro." };
+    }
+
+    console.error("Erro na inserção:", error);
+    return { error: "Ocorreu um erro ao criar seu perfil. Tente novamente mais tarde." };
   }
 
-  // remove pending
+  // Remove dos pendentes apenas após o sucesso
   await supabase
     .from("pending_users")
     .delete()
     .eq("email", user.email);
+
+  return { success: true, message: "Perfil criado com sucesso!" };
 }

@@ -92,15 +92,46 @@ export async function registerUser(
   ========================= */
   const { error: pendingError } = await supabase
     .from("pending_users")
-    .insert({
-      email,
-      username,
-      name,
-      bio,
-    });
+    .upsert(
+      {
+        email,
+        username,
+        name,
+        bio,
+      },
+      {
+        onConflict: "email",
+      }
+    );
 
   if (pendingError) {
     return { error: "Erro ao salvar dados temporários" };
+  }
+
+    /* =========================
+    CHECK PENDING
+  ========================= */
+  const { data: existingPending } = await supabase
+  .from("pending_users")
+  .select("id")
+  .eq("username", username)
+  .maybeSingle();
+
+  if (existingPending) {
+    return { error: "Username já está em uso" };
+  }
+
+
+/* =========================
+    consistência global
+  ========================= */
+
+  const { data: isTaken } = await supabase.rpc("is_username_taken", {
+    p_username: username,
+  });
+
+  if (isTaken) {
+    return { error: "Username já está em uso" };
   }
 
   /* =========================
