@@ -1,31 +1,93 @@
-import { ImageResponse } from '@vercel/og';
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 
-export const runtime = 'edge';
+import { themes, ThemeName } from "@/components/share/themes";
+
+export const runtime = "nodejs"; // importante na Vercel
 
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const title = searchParams.get("title") || "Título";
+  try {
+    const { searchParams } = new URL(req.url);
 
-  return new ImageResponse(
-    (
-      <div
-        style={{
-          height: '100%',
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#000', // Use hex para garantir
-          color: '#fff',
-        }}
-      >
-        <h1 style={{ fontSize: 60 }}>{title}</h1>
-      </div>
-    ),
-    {
-      width: 360,
-      height: 640,
+    const title = searchParams.get("title") || "Título";
+    const username = searchParams.get("username") || "user";
+    const status = searchParams.get("status") || "finished";
+    const type = searchParams.get("type") || "movie";
+    const rating = searchParams.get("rating") || "";
+    const themeParam = searchParams.get("theme");
+
+    const theme: ThemeName =
+      themeParam && themeParam in themes
+        ? (themeParam as ThemeName)
+        : "dark";
+
+    // -------------------------
+    // 1. ABRIR BROWSER (ADAPTADO)
+    // -------------------------
+    const browser = await puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: {
+        width: 360,
+        height: 640,
+        deviceScaleFactor: 3,
+      },
+      executablePath: await chromium.executablePath()
+    });
+
+    const page = await browser.newPage();
+
+    // -------------------------
+    // 2. URL DO PREVIEW
+    // -------------------------
+    const baseUrl =
+      process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : "http://localhost:3000";
+
+    const url = `${baseUrl}/share-preview?title=${encodeURIComponent(
+      title
+    )}&username=${encodeURIComponent(
+      username
+    )}&status=${status}&type=${type}&rating=${rating}&theme=${theme}`;
+
+    await page.goto(url, {
+      waitUntil: "networkidle0",
+    });
+
+    // -------------------------
+    // 3. PEGAR ELEMENTO
+    // -------------------------
+    const element = await page.$("#share-card");
+
+    if (!element) {
+      throw new Error("Share card not found");
     }
-  );
+
+    // -------------------------
+    // 4. SCREENSHOT
+    // -------------------------
+    const screenshot = await element.screenshot({
+      type: "png",
+    });
+
+    await browser.close();
+
+    // -------------------------
+    // 5. RESPONSE
+    // -------------------------
+    const uint8 = new Uint8Array(screenshot as Uint8Array);
+
+    return new Response(uint8, {
+      headers: {
+        "Content-Type": "image/png",
+      },
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    return new Response("Erro ao gerar imagem", {
+      status: 500,
+    });
+  }
 }
