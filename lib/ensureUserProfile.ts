@@ -7,37 +7,53 @@ export async function ensureUserProfile() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  console.log("USER:", user);
+
   if (!user) return;
 
-  // já existe?
+  // verifica se já existe
   const { data: existing } = await supabase
     .from("users")
     .select("id")
     .eq("id", user.id)
     .maybeSingle();
 
+  console.log("EXISTING:", existing);
+
   if (existing) return;
 
   // busca pending
-  const { data: pending } = await supabase
+  const { data: pending, error: pendingError } = await supabase
     .from("pending_users")
     .select("*")
     .eq("email", user.email)
     .maybeSingle();
 
-  if (!pending) return;
+  console.log("PENDING:", pending);
+  console.log("PENDING ERROR:", pendingError);
+
+  if (!pending) {
+    console.log("NO PENDING USER FOUND");
+    return;
+  }
 
   // cria profile
-  const { error } = await supabase.from("users").insert({
-    id: user.id,
-    email: user.email,
-    username: pending.username,
-    name: pending.name,
-    bio: pending.bio,
-  });
+  const { data, error } = await supabase
+    .from("users")
+    .insert({
+      id: user.id,
+      email: user.email,
+      username: pending.username,
+      name: pending.name,
+      bio: pending.bio,
+    })
+    .select()
+    .single();
+
+  console.log("INSERT RESULT:", data);
+  console.log("INSERT ERROR:", error);
 
   if (error) {
-    console.error("Error creating profile:", error);
     return;
   }
 
