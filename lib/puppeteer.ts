@@ -12,16 +12,15 @@ export async function getBrowser() {
     });
   }
 
-  const executablePath = await chromium.executablePath();
+  const executablePath =
+  process.env.NODE_ENV === "production"
+    ? await chromium.executablePath()
+    : undefined;
 
-  return puppeteer.launch({
-    args: [
-      ...chromium.args,
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-    ],
+    return puppeteer.launch({
+    args: [...chromium.args, "--no-sandbox"],
     executablePath,
     headless: true,
-    defaultViewport: { width: 1200, height: 630 },
-  });
+    defaultViewport: { width: 360, height: 640 },
+    });
 }

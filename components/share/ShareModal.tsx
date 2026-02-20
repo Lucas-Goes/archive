@@ -67,7 +67,7 @@ export function ShareModal({
       setIsExporting(true);
 
       try {
-      const url = `${window.location.origin}/share-preview?title=${encodeURIComponent(
+      const url = `${window.location.origin}/api/share-image?title=${encodeURIComponent(
         title
       )}&username=${encodeURIComponent(
         username

@@ -8,7 +8,6 @@ export async function GET(req: Request) {
 
   try {
     const { searchParams } = new URL(req.url);
-
     const title = searchParams.get("title") || "Título";
     const username = searchParams.get("username") || "user";
     const status = searchParams.get("status") || "finished";
@@ -16,141 +15,99 @@ export async function GET(req: Request) {
     const rating = searchParams.get("rating") || "";
     const theme = searchParams.get("theme") || "dark";
 
-    // -------------------------
-    // 1. BROWSER
-    // -------------------------
+    // 1. Configuração do Browser (Otimizada para Serverless)
     browser = await puppeteer.launch({
-      args: chromium.args,
+      args: [...chromium.args, "--font-render-hinting=none"], // Melhora renderização de fontes
       executablePath: await chromium.executablePath(),
       headless: true,
       defaultViewport: {
-        width: 360,
-        height: 640,
-        deviceScaleFactor: 2,
+        width: 1200, // Largura maior para evitar quebras de linha inesperadas
+        height: 1200,
+        deviceScaleFactor: 2, // Garante alta resolução (Retina)
       },
     });
 
     const page = await browser.newPage();
+    
+    // Evita cache excessivo que pode mostrar dados antigos
+    await page.setCacheEnabled(false);
 
-    // -------------------------
-    // 2. URL
-    // -------------------------
-    const baseUrl =
-      process.env.NEXT_PUBLIC_SITE_URL || "https://archive-me.com";
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://archive-me.com";
+    const url = `${baseUrl}/share-preview?title=${encodeURIComponent(title)}&username=${encodeURIComponent(username)}&status=${status}&type=${type}&rating=${rating}&theme=${theme}`;
 
-    const url = `${baseUrl}/share-preview?title=${encodeURIComponent(
-      title
-    )}&username=${encodeURIComponent(
-      username
-    )}&status=${status}&type=${type}&rating=${rating}&theme=${theme}`;
-
-    console.log("URL:", url);
-
-    // -------------------------
-    // 3. LOAD PAGE
-    // -------------------------
+    // 2. Navegação com timeout estendido
     await page.goto(url, {
-      waitUntil: "networkidle2",
-      timeout: 60000,
+      waitUntil: ["networkidle0", "domcontentloaded"], // Espera o tráfego de rede zerar
+      timeout: 45000,
     });
 
-    // -------------------------
-// ESPERAR CARD
-// -------------------------
-await page.waitForSelector("#share-card", {
-  visible: true,
-  timeout: 20000,
-});
-
-// -------------------------
-// ESPERAR TEXTO + LAYOUT
-// -------------------------
-await page.waitForFunction(() => {
-  const el = document.querySelector("#share-card") as HTMLElement | null;
-  if (!el) return false;
-
-  const hasText = el.innerText && el.innerText.length > 10;
-  const rect = el.getBoundingClientRect();
-
-  return hasText && rect.width > 0 && rect.height > 0;
-});
-
-// -------------------------
-// ESPERAR IMAGENS
-// -------------------------
-await page.waitForFunction(() => {
-  const images = Array.from(document.images);
-  return images.every((img) => img.complete);
-}, { timeout: 30000 });
-
-// -------------------------
-// ESPERAR IMAGEM REAL
-// -------------------------
-await page.waitForFunction(() => {
-  const img = document.querySelector("img");
-  if (!img) return true;
-
-  return img.naturalWidth > 0;
-});
-
-// -------------------------
-// ESPERAR FONTES
-// -------------------------
-await page.evaluate(async () => {
-  await document.fonts.ready;
-});
-
-// -------------------------
-// ESPERAR PAINT FINAL
-// -------------------------
-await page.evaluate(() => {
-  return new Promise((resolve) => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(resolve);
-    });
-  });
-});
-
+    // 3. Blindagem de Fontes (Injeta e aguarda carregamento real)
     await page.addStyleTag({
-      url: "https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap",
+      url: "https://fonts.googleapis.com",
     });
 
-    await page.waitForFunction(() => {
-      return document.styleSheets.length > 0;
+    // 4. A "Grande Validação": Conteúdo + Imagens + Layout
+    await page.waitForFunction(
+      (expectedRating) => {
+        const el = document.querySelector("#share-card") as HTMLElement;
+        if (!el) return false;
+
+        // A. Verifica se as imagens estão prontas (tamanho > 0)
+        const imgs = Array.from(document.images);
+        const imgsLoaded = imgs.every(img => img.complete && img.naturalWidth > 0);
+
+        // B. Verifica se o texto do rating já foi injetado (hidratação do React)
+        const textIsReady = expectedRating ? el.innerText.includes(expectedRating) : el.innerText.length > 10;
+
+        // C. Verifica se o elemento tem dimensões físicas
+        const rect = el.getBoundingClientRect();
+        const layoutReady = rect.width > 0 && rect.height > 0;
+
+        return imgsLoaded && textIsReady && layoutReady;
+      },
+      { timeout: 25000 },
+      rating
+    );
+
+    // 5. Finalização de Renderização (O "Pulo do Gato")
+    await page.evaluate(async () => {
+      // Garante que todas as fontes (incluindo as da página) foram baixadas
+      await document.fonts.ready;
+      
+      // Força o navegador a processar o ciclo de pintura (paint)
+      await new Promise((resolve) => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(resolve);
+        });
+      });
     });
 
-    await new Promise((r) => setTimeout(r, 300));
+    // Delay de segurança final para estabilização de transições CSS (se houver)
+    await new Promise((r) => setTimeout(r, 500));
 
-    // -------------------------
-    // 9. SCREENSHOT
-    // -------------------------
+    // 6. Screenshot Preciso
     const element = await page.$("#share-card");
-
-    if (!element) {
-      throw new Error("Share card not found");
-    }
+    if (!element) throw new Error("Elemento #share-card não encontrado");
 
     const screenshot = await element.screenshot({
       type: "png",
+      omitBackground: true, // Útil se o card tiver bordas arredondadas
     });
 
-    const buffer =
-      screenshot instanceof Buffer
-        ? screenshot
-        : Buffer.from(screenshot as Uint8Array);
+    const buffer = Buffer.from(screenshot as Uint8Array);
 
     return new Response(buffer, {
       headers: {
         "Content-Type": "image/png",
+        "Cache-Control": "public, max-age=31536000, immutable", // Cache para performance
         "Content-Length": buffer.length.toString(),
       },
     });
-  } catch (error) {
-    console.error("ERRO:", error);
-    return new Response("Erro ao gerar imagem", { status: 500 });
+
+  } catch (error: any) {
+    console.error("ERRO CRÍTICO NA GERAÇÃO:", error.message);
+    return new Response(`Erro ao gerar imagem: ${error.message}`, { status: 500 });
   } finally {
-    if (browser) {
-      await browser.close();
-    }
+    if (browser) await browser.close();
   }
 }
