@@ -84,26 +84,38 @@ export function ShareModal({
         const blob = await response.blob();
 
         // 👉 TENTA COMPARTILHAR
-        try {
-          const file = new File([blob], "archive.png", {
-            type: "image/png",
-          });
+        // 👉 tenta compartilhar (MOBILE)
+        const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
 
-          if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        if (isMobile && navigator.share) {
+          try {
+            const file = new File([blob], "archive.png", {
+              type: "image/png",
+            });
+
             await navigator.share({
               files: [file],
               title: "Archive",
             });
-            return;
+
+            return; // sucesso → sai daqui
+          } catch (e) {
+            console.log("share cancelado ou falhou");
           }
-        } catch (e) {
-          console.log("share falhou, fallback download");
         }
 
         // 👉 FALLBACK (SEMPRE FUNCIONA)
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = "archive.png";
+        
+        const safeTitle = title
+        .toLowerCase()
+        .replace(/[^a-z0-9]/gi, "-") // remove caracteres estranhos
+        .replace(/-+/g, "-"); // evita múltiplos -
+
+        const fileName = `${username}-${safeTitle}.png`;
+
+        link.download = fileName;
         link.click();
 
       } catch (err) {
