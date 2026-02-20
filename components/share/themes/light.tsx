@@ -23,7 +23,7 @@ export function LightTheme({
       style={{
         color: "#111",
         border: "1px solid rgba(0,0,0,0.08)",
-        fontFamily: "system-ui, -apple-system, sans-serif",
+        fontFamily: "Arial, sans-serif",
       }}
     >
       {/* BACKGROUND IMAGE */}
@@ -90,7 +90,7 @@ export function LightTheme({
             <span>Categoria: {type}</span>
 
             {rating && (
-              <span>Nota {"★".repeat(rating)}</span>
+              <span>Nota {"★★★★★".slice(0, rating)}</span>
             )}
           </div>
 

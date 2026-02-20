@@ -35,7 +35,7 @@ export async function GET(req: Request) {
       defaultViewport: {
         width: 360,
         height: 640,
-        deviceScaleFactor: 3,
+        deviceScaleFactor: 2,
       },
     });
 
@@ -103,6 +103,10 @@ export async function GET(req: Request) {
     // -------------------------
     await page.evaluate(async () => {
       await document.fonts.ready;
+    });
+
+    await page.evaluate(() => {
+      document.body.style.margin = "0";
     });
 
     console.log("FONTES OK");
