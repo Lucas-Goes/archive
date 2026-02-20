@@ -42,9 +42,20 @@ export async function GET(req: Request) {
     });
 
     // 3. Blindagem de Fontes (Injeta e aguarda carregamento real)
-    await page.addStyleTag({
-      url: "https://fonts.googleapis.com",
-    });
+    try {
+      // Tentamos carregar a fonte, mas com um timeout curto para não travar tudo
+      await page.addStyleTag({
+        url: "https://fonts.googleapis.com",
+      }).catch(err => console.warn("Aviso: Google Fonts demorou a responder, usando fontes locais."));
+
+      // Espera as fontes estarem prontas, mas com limite de 2 segundos
+      await Promise.race([
+        page.evaluate(() => document.fonts.ready),
+        new Promise(resolve => setTimeout(resolve, 2000))
+      ]);
+    } catch (e) {
+      console.error("Erro não fatal ao carregar estilos:", e);
+    }
 
     // 4. A "Grande Validação": Conteúdo + Imagens + Layout
     await page.waitForFunction(
