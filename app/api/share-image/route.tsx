@@ -77,7 +77,7 @@ export async function GET(req: Request) {
     // 4. SCREENSHOT
     // -------------------------
     const screenshot = await element.screenshot({
-      fullPage: true,
+      type: "png",
     });
 
     await browser.close();
