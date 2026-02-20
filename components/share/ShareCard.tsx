@@ -84,16 +84,18 @@ export function ShareCard({
 
   // 🔥 3. RENDERIZAR TEMA
   return (
-    <ThemeComponent
-      title={title}
-      username={username}
-      status={status}
-      type={type}
-      rating={rating}
-      line1={line1}
-      line2={line2}
-      formatType={formatType}
-      renderStars={renderStars}
-    />
+    <div id="share-card">
+      <ThemeComponent
+        title={title}
+        username={username}
+        status={status}
+        type={type}
+        rating={rating}
+        line1={line1}
+        line2={line2}
+        formatType={formatType}
+        renderStars={renderStars}
+      />
+    </div>
   );
 }
