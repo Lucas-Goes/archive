@@ -39,11 +39,7 @@ export async function GET(req: Request) {
     // -------------------------
     // 2. URL DO PREVIEW
     // -------------------------
-    const baseUrl =
-      process.env.NEXT_PUBLIC_SITE_URL ||
-      (process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : "http://localhost:3000");
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://archive-me.com";
 
     console.log('OLHA_ISSO_MANO', baseUrl)    
 
@@ -53,19 +49,25 @@ export async function GET(req: Request) {
       username
     )}&status=${status}&type=${type}&rating=${rating}&theme=${theme}`;
 
-    await page.goto(url, {
-      waitUntil: "networkidle0",
+    const response = await page.goto(url, {
+      waitUntil: "domcontentloaded",
     });
+
+    console.log("STATUS:", response?.status());
+    console.log("URL FINAL:", page.url());
+
+    const html = await page.content();
+    console.log("TEM SHARE CARD?", html.includes("share-card"));
 
     // -------------------------
     // 3. PEGAR ELEMENTO
     // -------------------------
-    const element = await page.$("#share-card");
-
     await page.waitForSelector("#share-card", {
-      timeout: 10000,
+      timeout: 15000,
       visible: true,
     });
+
+    const element = await page.$("#share-card");
 
     if (!element) {
       throw new Error("Share card not found");
