@@ -3,10 +3,9 @@
 
 import { useState, useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr";
-import { useSearchParams, useRouter } from "next/navigation";
+import {  useRouter } from "next/navigation";
 
 export default function ResetPasswordPage() {
-  const searchParams = useSearchParams();
   const router = useRouter();
   
   const supabase = createBrowserClient(
@@ -22,33 +21,20 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     async function validateSession() {
-      // pega hash da URL (#access_token=...)
-      const hash = window.location.hash;
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("code");
 
-      if (!hash) {
+      if (!code) {
         setMessage("Link inválido ou expirado.");
         setIsValidating(false);
         return;
       }
 
-      const params = new URLSearchParams(hash.substring(1));
-      const access_token = params.get("access_token");
-      const refresh_token = params.get("refresh_token");
-
-      if (!access_token || !refresh_token) {
-        setMessage("Link inválido ou expirado.");
-        setIsValidating(false);
-        return;
-      }
-
-      // cria sessão manualmente
-      const { error } = await supabase.auth.setSession({
-        access_token,
-        refresh_token,
-      });
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
 
       if (error) {
-        setMessage("Erro ao validar sessão.");
+        console.error("SESSION ERROR:", error);
+        setMessage("Link inválido ou expirado.");
       }
 
       setIsValidating(false);
