@@ -31,7 +31,7 @@ function formatType(type: string) {
 }
 
 function renderStars(rating: number) {
-  return "★★★★★".slice(0, rating);
+  return "★".repeat(rating);
 }
 
 function getHeadlineParts(status: string, type: string) {
@@ -76,7 +76,7 @@ export function DarkTheme({
         backgroundColor: "#0b0b0b",
         color: "#ffffff",
         border: "1px solid rgba(255,255,255,0.05)",
-        fontFamily: "Inter, sans-serif"
+        fontFamily: "system-ui, -apple-system, sans-serif",
       }}
     >
       {/* BACKGROUND */}
