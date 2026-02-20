@@ -25,16 +25,24 @@ export default function ResetPasswordPage() {
       const code = params.get("code");
 
       if (!code) {
-        setMessage("Link inválido ou expirado.");
+        // Se não tem code, verifica se já existe uma sessão ativa (caso o redirect já tenha funcionado)
+        const { data } = await supabase.auth.getSession();
+        if (!data.session) {
+          setMessage("Link inválido ou expirado.");
+        }
         setIsValidating(false);
         return;
       }
 
+      // Troca o código pela sessão
       const { error } = await supabase.auth.exchangeCodeForSession(code);
 
       if (error) {
-        console.error("SESSION ERROR:", error);
+        console.error("Erro na troca de código:", error.message);
         setMessage("Link inválido ou expirado.");
+      } else {
+        // Limpa a mensagem de erro caso a sessão seja válida
+        setMessage(""); 
       }
 
       setIsValidating(false);
