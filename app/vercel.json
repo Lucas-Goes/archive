@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "archive-sepia-ten.vercel.app"
+        }
+      ],
+      "destination": "https://archive-me.com/$1",
+      "permanent": true
+    }
+  ]
+}
