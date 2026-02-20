@@ -189,6 +189,7 @@ export function RegisterForm({ onSuccess }: Props) {
         className="input-dark"
       />
 
+     <div className="relative">
       <input
         name="password"
         type={showPassword ? "text" : "password"}
@@ -209,6 +210,7 @@ export function RegisterForm({ onSuccess }: Props) {
             <EyeIcon />
           )} 
         </button>
+     </div>        
 
       {error && (
         <p className="text-sm text-red-400">{error}</p>
