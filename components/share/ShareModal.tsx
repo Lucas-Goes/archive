@@ -86,10 +86,17 @@ export function ShareModal({
         // 👉 TENTA COMPARTILHAR
         // 👉 tenta compartilhar (MOBILE)
         const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+        const safeTitle = title
+        .toLowerCase()
+        .replace(/[^a-z0-9]/gi, "-") // remove caracteres estranhos
+        .replace(/-+/g, "-"); // evita múltiplos -
+
+        const fileName = `${username}-${safeTitle}.png`; 
+        
 
         if (isMobile && navigator.share) {
           try {
-            const file = new File([blob], "archive.png", {
+            const file = new File([blob], fileName, {
               type: "image/png",
             });
 
@@ -107,14 +114,6 @@ export function ShareModal({
         // 👉 FALLBACK (SEMPRE FUNCIONA)
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        
-        const safeTitle = title
-        .toLowerCase()
-        .replace(/[^a-z0-9]/gi, "-") // remove caracteres estranhos
-        .replace(/-+/g, "-"); // evita múltiplos -
-
-        const fileName = `${username}-${safeTitle}.png`;
-
         link.download = fileName;
         link.click();
 
@@ -135,8 +134,26 @@ export function ShareModal({
       }}
       onClick={onClose}
     >
+
+      <button
+        onClick={onClose}
+        className="absolute top-3 right-3 text-white text-xl"
+      >
+        ✕
+      </button>
+
       <div
-        className="relative bg-[#0c0c0c] rounded-2xl p-6 space-y-6"
+        className="
+                  relative
+                  bg-[#0c0c0c]
+                  rounded-2xl
+                  p-4
+                  space-y-4
+                  w-[95vw]
+                  max-w-md
+                  max-h-[90vh]
+                  overflow-y-auto
+                  "
         onClick={(e) => e.stopPropagation()}
       >
 
