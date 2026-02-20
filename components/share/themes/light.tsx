@@ -23,7 +23,7 @@ export function LightTheme({
       style={{
         color: "#111",
         border: "1px solid rgba(0,0,0,0.08)",
-        fontFamily: "Inter, sans-serif"
+        fontFamily: "system-ui, -apple-system, sans-serif",
       }}
     >
       {/* BACKGROUND IMAGE */}
@@ -89,9 +89,9 @@ export function LightTheme({
           <div className="text-[12px] font-bold flex justify-between text-sm text-black/60">
             <span>Categoria: {type}</span>
 
-          {typeof rating === "number" && rating > 0 && (
-            <span>Nota {"★".repeat(rating)}</span>
-          )}
+            {rating !== undefined && rating !== null && (
+              <span>Nota {"★★★★★".slice(0, rating)}</span>
+            )}
           </div>
 
           {/* FOOTER */}

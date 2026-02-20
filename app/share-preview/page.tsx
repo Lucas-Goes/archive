@@ -48,7 +48,11 @@ export default async function SharePreviewPage({ searchParams }: Props) {
         username={username}
         status={status}
         type={type}
-        rating={rating ? Number(rating) : undefined}
+        rating={
+        rating !== undefined && rating !== null && rating !== ""
+          ? Number(rating)
+          : undefined
+        }
         theme={theme}
       />
     </main>

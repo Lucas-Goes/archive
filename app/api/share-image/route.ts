@@ -50,7 +50,7 @@ export async function GET(req: Request) {
     // 3. LOAD PAGE
     // -------------------------
     await page.goto(url, {
-      waitUntil: "domcontentloaded",
+      waitUntil: "networkidle2",
       timeout: 60000,
     });
 
@@ -110,6 +110,16 @@ await page.evaluate(() => {
     });
   });
 });
+
+    await page.addStyleTag({
+      url: "https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap",
+    });
+
+    await page.waitForFunction(() => {
+      return document.styleSheets.length > 0;
+    });
+
+    await new Promise((r) => setTimeout(r, 300));
 
     // -------------------------
     // 9. SCREENSHOT

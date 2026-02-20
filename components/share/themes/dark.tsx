@@ -137,7 +137,7 @@ export function DarkTheme({
           >
             <span>Categoria: {formatType(type)}</span>
 
-            {rating && (
+            {rating !== undefined && rating !== null && (
               <span className="flex items-center gap-1">
                 Nota {renderStars(rating)}
               </span>
