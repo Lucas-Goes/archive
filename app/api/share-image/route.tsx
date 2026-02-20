@@ -109,6 +109,10 @@ export async function GET(req: Request) {
       document.body.style.margin = "0";
     });
 
+    await page.addStyleTag({
+      url: "https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap",
+    });
+
     console.log("FONTES OK");
 
     // -------------------------

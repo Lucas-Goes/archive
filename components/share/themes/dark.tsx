@@ -76,7 +76,7 @@ export function DarkTheme({
         backgroundColor: "#0b0b0b",
         color: "#ffffff",
         border: "1px solid rgba(255,255,255,0.05)",
-        fontFamily: "system-ui, -apple-system, sans-serif",
+        fontFamily: "Inter, sans-serif"
       }}
     >
       {/* BACKGROUND */}
