@@ -66,23 +66,13 @@ if (existingEmail) {
 
   const userId = data.user.id;
 
-  // criar perfil
-  const { error: insertError } = await supabase
-    .from("users")
-    .insert({
-      id: userId,
-      email: email,
-      name: name,
-      username: username,
-      bio: bio,
-    });
-
-  if (insertError) {
-    console.error("INSERT ERROR:", insertError);
-    return { error: insertError.message };
-  }
-
-  return { success: true, username };
+  // 🔥 salvar temporário
+  await supabase.from("pending_users").insert({
+    email,
+    username,
+    name,
+    bio,
+  });
 
 }
 

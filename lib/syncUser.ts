@@ -9,31 +9,11 @@ export async function syncUser() {
 
   if (!user) return null;
 
-  // verifica se já existe
-  const { data: existing } = await supabase
+  const { data } = await supabase
     .from("users")
     .select("*")
     .eq("id", user.id)
-    .single();
-
-  if (existing) return existing;
-
-  // cria novo user
-  const { data, error } = await supabase
-    .from("users")
-    .insert({
-      id: user.id,
-      username: user.email?.split("@")[0],
-      name: user.email,
-      bio: "",
-    })
-    .select()
-    .single();
-
-  if (error) {
-    console.error(error);
-    return null;
-  }
+    .maybeSingle();
 
   return data;
 }

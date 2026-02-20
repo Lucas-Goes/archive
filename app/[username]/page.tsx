@@ -21,6 +21,7 @@ import { LogoutButton } from "@/components/ui/LogoutButton";
 import { LoginButton } from "@/components/ui/LoginButton";
 import { EmptyState } from "@/components/profile/EmptyState";
 import { MyProfileButton } from "@/components/ui/MyProfileButton";
+import { ensureUserProfile } from "@/lib/ensureUserProfile";
 
 /* =====================================================
   PAGE
@@ -41,6 +42,7 @@ export default async function PublicProfilePage({
   /* =========================
     AUTH / USER
   ========================= */
+  await ensureUserProfile();
   await syncUser();
   const currentUser = await getCurrentUser();
 
