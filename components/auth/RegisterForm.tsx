@@ -17,6 +17,7 @@ export function RegisterForm({ onSuccess }: Props) {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const [username, setUsername] = useState("");
   const [usernameStatus, setUsernameStatus] = useState<
@@ -190,11 +191,24 @@ export function RegisterForm({ onSuccess }: Props) {
 
       <input
         name="password"
-        type="password"
+        type={showPassword ? "text" : "password"}
         placeholder="Senha"
         required
-        className="input-dark"
+        className="input-dark" 
       />
+
+      <button
+          type="button"
+          onClick={() => setShowPassword((v) => !v)}
+          aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/60 transition"
+        >
+          {showPassword ? (
+            <EyeOffIcon /> // Componentize os SVGs para limpar o código
+          ) : (
+            <EyeIcon />
+          )} 
+        </button>
 
       {error && (
         <p className="text-sm text-red-400">{error}</p>
@@ -211,3 +225,17 @@ export function RegisterForm({ onSuccess }: Props) {
     </form>
   );
 }
+
+// Componentes auxiliares para os ícones
+const EyeIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-4 h-4" strokeWidth="2.5">
+    <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+const EyeOffIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-4 h-4" strokeWidth="2.5">
+    <path d="M3 3l18 18M10.58 10.58a2 2 0 002.83 2.83M16.24 16.24A9.77 9.77 0 0112 17c-5 0-9-5-9-5a16.17 16.17 0 014.24-4.24M9.88 5.08A9.77 9.77 0 0112 5c5 0 9 5 9 5a16.17 16.17 0 01-2.16 2.94" />
+  </svg>
+);
