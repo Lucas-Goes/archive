@@ -66,7 +66,7 @@ export default async function PublicProfilePage({
   return (
     <main className="page">
       <div className="page-container">
-        <p style={{ color: "red" }}>VERSION 2</p>
+        
         {/* =====================================================
           FLOATING ACTIONS (TOP RIGHT)
         ===================================================== */}
