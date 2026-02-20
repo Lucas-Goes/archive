@@ -1,5 +1,6 @@
-import { createClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase-server";
+import { ensureUserProfile } from "@/lib/ensureUserProfile";
 
 export default async function MePage() {
   const supabase = await createClient();
@@ -9,10 +10,13 @@ export default async function MePage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/");
+    return redirect("/");
   }
 
-  // buscar profile - Esse codigo serve para redirecionar pro perfi ou pra home atraves da /me
+  // 🔥 CRIA PROFILE SE PRECISAR
+  await ensureUserProfile();
+
+  // busca user criado
   const { data: profile } = await supabase
     .from("users")
     .select("username")
@@ -20,8 +24,8 @@ export default async function MePage() {
     .single();
 
   if (!profile) {
-    redirect("/");
+    return redirect("/");
   }
 
-  redirect(`/${profile.username}`);
+  return redirect(`/${profile.username}`);
 }
