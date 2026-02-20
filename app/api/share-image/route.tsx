@@ -53,20 +53,20 @@ export async function GET(req: Request) {
       waitUntil: "domcontentloaded",
     });
 
-    console.log("STATUS:", response?.status());
-    console.log("URL FINAL:", page.url());
-
-    const html = await page.content();
-    console.log("TEM SHARE CARD?", html.includes("share-card"));
+    await page.goto(url, {
+      waitUntil: "networkidle0",
+    });
 
     // -------------------------
     // 3. PEGAR ELEMENTO
     // -------------------------
     await page.waitForSelector("#share-card", {
       timeout: 15000,
-      visible: true,
     });
 
+    // pequeno delay pra garantir layout
+    await new Promise((r) => setTimeout(r, 500));
+    
     const element = await page.$("#share-card");
 
     if (!element) {
@@ -77,7 +77,7 @@ export async function GET(req: Request) {
     // 4. SCREENSHOT
     // -------------------------
     const screenshot = await element.screenshot({
-      type: "png",
+      fullPage: true,
     });
 
     await browser.close();
