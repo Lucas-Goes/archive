@@ -1,35 +1,46 @@
 import { ImageResponse } from '@vercel/og';
+import { themes, ThemeName } from "@/components/share/themes";
 
-// Opcional: O runtime 'edge' é muito mais rápido e barato que o 'nodejs'
 export const runtime = 'edge';
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+
+    const title = searchParams.get("title") || "Título";
+    const username = searchParams.get("username") || "user";
+    const status = searchParams.get("status") || "finished";
+    const type = searchParams.get("type") || "movie";
+    const rating = searchParams.get("rating") || "";
+    const themeParam = searchParams.get("theme");
+    
+    const themeName: ThemeName =
+      themeParam && themeParam in themes
+        ? (themeParam as ThemeName)
+        : "dark";
+
+    const ThemeComponent = themes[themeName] as any; 
+
     return new ImageResponse(
       (
-        // O layout em JSX substitui o page.setContent
-        <div
-          style={{
-            backgroundColor: 'black',
-            color: 'white',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            height: '100%',
-            flexDirection: 'column',
-          }}
-        >
-          <h1 style={{ fontSize: 80, fontWeight: 'bold' }}>Archive</h1>
+        <div style={{ display: 'flex', width: '100%', height: '100%' }}>
+          <ThemeComponent 
+            title={title}
+            username={username}
+            status={status}
+            type={type}
+            rating={rating}
+          />
         </div>
       ),
       {
-        width: 1200,
-        height: 630,
-      },
+        // Certifique-se de que estes valores são números, sem aspas
+        width: 360,
+        height: 640,
+      }
     );
-  } catch (e: any) {
-    console.log(`${e.message}`);
+  } catch (error: any) {
+    console.error(error);
     return new Response(`Erro ao gerar imagem`, { status: 500 });
   }
 }
