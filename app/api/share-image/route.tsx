@@ -63,8 +63,8 @@ export async function GET(req: Request) {
     console.log("ABRINDO PÁGINA...");
 
     await page.goto(url, {
-      waitUntil: "networkidle0",
-      timeout: 60000,
+      waitUntil: "domcontentloaded",
+      timeout: 30000,
     });
 
     console.log("ABRIU PAGINA");
