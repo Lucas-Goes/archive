@@ -1,8 +1,6 @@
 import puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
 
-import { themes, ThemeName } from "@/components/share/themes";
-
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {
@@ -16,18 +14,11 @@ export async function GET(req: Request) {
     const status = searchParams.get("status") || "finished";
     const type = searchParams.get("type") || "movie";
     const rating = searchParams.get("rating") || "";
-    const themeParam = searchParams.get("theme");
-
-    const theme: ThemeName =
-      themeParam && themeParam in themes
-        ? (themeParam as ThemeName)
-        : "dark";
+    const theme = searchParams.get("theme") || "dark";
 
     // -------------------------
     // 1. BROWSER
     // -------------------------
-    console.log("INICIANDO BROWSER...");
-
     browser = await puppeteer.launch({
       args: chromium.args,
       executablePath: await chromium.executablePath(),
@@ -47,142 +38,104 @@ export async function GET(req: Request) {
     const baseUrl =
       process.env.NEXT_PUBLIC_SITE_URL || "https://archive-me.com";
 
-    console.log("BASE URL:", baseUrl);
-
     const url = `${baseUrl}/share-preview?title=${encodeURIComponent(
       title
     )}&username=${encodeURIComponent(
       username
     )}&status=${status}&type=${type}&rating=${rating}&theme=${theme}`;
 
-    console.log("URL FINAL:", url);
+    console.log("URL:", url);
 
     // -------------------------
-    // 3. ABRIR PÁGINA
+    // 3. LOAD PAGE
     // -------------------------
-    console.log("ABRINDO PÁGINA...");
-
     await page.goto(url, {
       waitUntil: "domcontentloaded",
-      timeout: 30000,
+      timeout: 60000,
     });
 
-    console.log("ABRIU PAGINA");
-
     // -------------------------
-    // 4. ESPERAR ELEMENTO
+    // 4. ESPERAR CARD EXISTIR
     // -------------------------
     await page.waitForSelector("#share-card", {
-      timeout: 15000,
+      visible: true,
+      timeout: 20000,
     });
 
-    console.log("ELEMENTO EXISTE");
+    // -------------------------
+    // 5. ESPERAR REACT FINALIZAR
+    // -------------------------
+    await page.waitForFunction(() => {
+      const el = document.querySelector("#share-card");
+      return el?.getAttribute("data-ready") === "true";
+    });
 
     // -------------------------
-    // 5. ESPERAR IMAGENS
+    // 6. ESPERAR IMAGENS
     // -------------------------
-    //await page.evaluate(async () => {
-    //  const images = Array.from(document.images);
-//
-    //  await Promise.all(
-    //    images.map((img) => {
-    //      if (img.complete) return;
-//
-    //      return new Promise((resolve) => {
-    //        img.onload = resolve;
-    //        img.onerror = resolve;
-    //      });
-    //    })
-    //  );
-    //});
+    await page.evaluate(async () => {
+      const images = Array.from(document.images);
 
-    console.log("IMAGENS OK");
+      await Promise.all(
+        images.map((img) => {
+          if (img.complete) return;
+
+          return new Promise((resolve) => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        })
+      );
+    });
 
     // -------------------------
-    // 6. ESPERAR FONTES
+    // 7. ESPERAR FONTES
     // -------------------------
     await page.evaluate(async () => {
       await document.fonts.ready;
     });
 
+    // -------------------------
+    // 8. GARANTIR PAINT FINAL
+    // -------------------------
     await page.evaluate(() => {
-      document.body.style.margin = "0";
+      return new Promise((resolve) => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(resolve);
+        });
+      });
     });
 
-    await page.addStyleTag({
-      url: "https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap",
-    });
-
-    console.log("FONTES OK");
-
     // -------------------------
-    // 7. DELAY FINAL
+    // 9. SCREENSHOT
     // -------------------------
-    await new Promise((r) => setTimeout(r, 300));
-
-    // -------------------------
-    // 8. PEGAR ELEMENTO
-    // -------------------------
-    console.log("PEGANDO ELEMENT...");
-
-    const element = await page.waitForSelector("#share-card", {
-      visible: true,
-      timeout: 20000,
-    });
+    const element = await page.$("#share-card");
 
     if (!element) {
       throw new Error("Share card not found");
     }
 
-    console.log("PEGOU ELEMENT");
-
-    // -------------------------
-    // 9. SCREENSHOT
-    // -------------------------
-    console.log("GERANDO SCREENSHOT...");
-
     const screenshot = await element.screenshot({
       type: "png",
     });
 
-    console.log("SCREENSHOT OK");
-
-    // -------------------------
-    // 10. NORMALIZAR BUFFER (CRÍTICO)
-    // -------------------------
     const buffer =
       screenshot instanceof Buffer
         ? screenshot
         : Buffer.from(screenshot as Uint8Array);
 
-    console.log("BUFFER OK:", buffer.length);
-
-    // -------------------------
-    // 11. RESPONSE
-    // -------------------------
     return new Response(buffer, {
       headers: {
         "Content-Type": "image/png",
         "Content-Length": buffer.length.toString(),
       },
     });
-
   } catch (error) {
-    console.error("ERRO COMPLETO:", error);
-    console.error("STACK:", (error as Error)?.stack);
-
-    return new Response("Erro ao gerar imagem", {
-      status: 500,
-    });
-
+    console.error("ERRO:", error);
+    return new Response("Erro ao gerar imagem", { status: 500 });
   } finally {
     if (browser) {
-      try {
-        await browser.close();
-        console.log("BROWSER FECHADO");
-      } catch (e) {
-        console.error("ERRO AO FECHAR BROWSER:", e);
-      }
+      await browser.close();
     }
   }
 }
