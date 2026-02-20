@@ -73,7 +73,10 @@ export function ShareModal({
         username
       )}&status=${status}&type=${type}&rating=${rating ?? ""}&theme=${theme}`;
 
+        console.log("CLICK SHARE");
+        console.log("URL:", url);
         const response = await fetch(url);
+        console.log("RESPONSE:", response.status);
 
         if (!response.ok) {
           const text = await response.text();
@@ -99,6 +102,7 @@ export function ShareModal({
           link.download = "archive.png";
           link.click();
         }
+
       } catch (err) {
         console.error(err);
         alert("Erro ao gerar imagem");
