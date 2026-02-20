@@ -91,7 +91,7 @@ export function RegisterForm({ onSuccess }: Props) {
         // 3. Executa o callback de fechar modal (se existir)
         onSuccess?.(); 
         // 4. Redireciona
-        router.push("/check-email");
+        router.push("https://archive-me.com/check-email");
       }, 2000);
 
     } else if (res && "error" in res) {
