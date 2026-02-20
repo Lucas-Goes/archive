@@ -31,7 +31,7 @@ function formatType(type: string) {
 }
 
 function renderStars(rating: number) {
-  return "★".repeat(rating);
+  return "★★★★★".slice(0, rating);
 }
 
 function getHeadlineParts(status: string, type: string) {

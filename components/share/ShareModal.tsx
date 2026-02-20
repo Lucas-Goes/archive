@@ -67,11 +67,11 @@ export function ShareModal({
       setIsExporting(true);
 
       try {
-      const url = `${window.location.origin}/api/share-image?title=${encodeURIComponent(
-        title
-      )}&username=${encodeURIComponent(
-        username
-      )}&status=${status}&type=${type}&rating=${rating ?? ""}&theme=${theme}`;
+        const url = `/api/share-image?title=${encodeURIComponent(
+          title
+        )}&username=${encodeURIComponent(
+          username
+        )}&status=${status}&type=${type}&rating=${rating ?? ""}&theme=${theme}`;
 
         const response = await fetch(url);
 
