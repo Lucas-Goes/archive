@@ -63,8 +63,8 @@ export async function GET(req: Request) {
     console.log("ABRINDO PÁGINA...");
 
     await page.goto(url, {
-      waitUntil: "domcontentloaded",
-      timeout: 30000,
+      waitUntil: "networkidle0",
+      timeout: 60000,
     });
 
     console.log("ABRIU PAGINA");
@@ -81,20 +81,20 @@ export async function GET(req: Request) {
     // -------------------------
     // 5. ESPERAR IMAGENS
     // -------------------------
-    await page.evaluate(async () => {
-      const images = Array.from(document.images);
-
-      await Promise.all(
-        images.map((img) => {
-          if (img.complete) return;
-
-          return new Promise((resolve) => {
-            img.onload = resolve;
-            img.onerror = resolve;
-          });
-        })
-      );
-    });
+    //await page.evaluate(async () => {
+    //  const images = Array.from(document.images);
+//
+    //  await Promise.all(
+    //    images.map((img) => {
+    //      if (img.complete) return;
+//
+    //      return new Promise((resolve) => {
+    //        img.onload = resolve;
+    //        img.onerror = resolve;
+    //      });
+    //    })
+    //  );
+    //});
 
     console.log("IMAGENS OK");
 
@@ -121,7 +121,10 @@ export async function GET(req: Request) {
     // -------------------------
     console.log("PEGANDO ELEMENT...");
 
-    const element = await page.$("#share-card");
+    const element = await page.waitForSelector("#share-card", {
+      visible: true,
+      timeout: 20000,
+    });
 
     if (!element) {
       throw new Error("Share card not found");
