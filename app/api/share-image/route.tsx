@@ -121,10 +121,7 @@ export async function GET(req: Request) {
     // -------------------------
     console.log("PEGANDO ELEMENT...");
 
-    const element = await page.waitForSelector("#share-card", {
-      visible: true,
-      timeout: 20000,
-    });
+    const element = await page.$("#share-card");
 
     if (!element) {
       throw new Error("Share card not found");
