@@ -8,8 +8,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const code = searchParams.get("code");
-
+  
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -23,26 +22,49 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     async function validateSession() {
-      if (code) {
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
-        if (error) {
-          setMessage("Link de recuperação inválido ou expirado.");
-        }
-      } else {
-        setMessage("Código de recuperação não encontrado.");
+      // pega hash da URL (#access_token=...)
+      const hash = window.location.hash;
+
+      if (!hash) {
+        setMessage("Link inválido ou expirado.");
+        setIsValidating(false);
+        return;
       }
+
+      const params = new URLSearchParams(hash.substring(1));
+      const access_token = params.get("access_token");
+      const refresh_token = params.get("refresh_token");
+
+      if (!access_token || !refresh_token) {
+        setMessage("Link inválido ou expirado.");
+        setIsValidating(false);
+        return;
+      }
+
+      // cria sessão manualmente
+      const { error } = await supabase.auth.setSession({
+        access_token,
+        refresh_token,
+      });
+
+      if (error) {
+        setMessage("Erro ao validar sessão.");
+      }
+
       setIsValidating(false);
     }
 
     validateSession();
-  }, [code, supabase.auth]);
+  }, []);
 
   async function handleUpdate() {
     setMessage("Atualizando...");
     
-    const { error } = await supabase.auth.updateUser({
+    const { data, error } = await supabase.auth.updateUser({
       password: password,
     });
+
+    console.log("UPDATE RESULT:", data, error);
 
     if (error) {
       setMessage(`Erro: ${error.message}`);
