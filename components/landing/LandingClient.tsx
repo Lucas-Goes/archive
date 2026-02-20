@@ -106,7 +106,7 @@ export function LandingClient() {
           <div className="flex flex-col items-start gap-4 mt-auto pb-5 md:h-full md:items-end justify-center md:-translate-y-8.5">
 
             <span className="text-4xl md:text-2xl font-normal text-white/80 tracking-tight md:-translate-x-4">
-              ArchiveEEEEE
+              Archive Me
             </span>
 
             <button
