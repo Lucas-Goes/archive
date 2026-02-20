@@ -1,5 +1,3 @@
-"use client";
-
 type Props = {
   title: string;
   username: string;
@@ -30,7 +28,7 @@ export function LightTheme({
     >
       {/* BACKGROUND IMAGE */}
       <img
-        src="/themes/light/light-bg2.jpg"
+        src="https://archive-me.com/themes/light/light-bg2.jpg"
         alt=""
         className="absolute inset-0 w-full h-full object-cover scale-160 translate-x-[-20px] translate-y-[110px]"
       />

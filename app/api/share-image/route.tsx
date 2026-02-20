@@ -45,6 +45,8 @@ export async function GET(req: Request) {
         ? `https://${process.env.VERCEL_URL}`
         : "http://localhost:3000");
 
+    console.log('OLHA_ISSO_MANO', baseUrl)    
+
     const url = `${baseUrl}/share-preview?title=${encodeURIComponent(
       title
     )}&username=${encodeURIComponent(
