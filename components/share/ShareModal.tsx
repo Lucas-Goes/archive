@@ -102,7 +102,7 @@ export function ShareModal({
 
             await navigator.share({
               files: [file],
-              title: "Archive",
+              title: fileName,
             });
 
             return; // sucesso → sai daqui
