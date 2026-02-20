@@ -21,35 +21,34 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     async function validateSession() {
+      // 1. Pega o code da URL
       const params = new URLSearchParams(window.location.search);
       const code = params.get("code");
 
-      if (!code) {
-        // Se não tem code, verifica se já existe uma sessão ativa (caso o redirect já tenha funcionado)
-        const { data } = await supabase.auth.getSession();
-        if (!data.session) {
-          setMessage("Link inválido ou expirado.");
+      // 2. Se tiver o code, tenta trocar pela sessão
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (error) {
+          console.error("Erro ao trocar código:", error);
+          // Não travamos o usuário ainda, vamos checar se ele já tem sessão abaixo
         }
-        setIsValidating(false);
-        return;
       }
 
-      // Troca o código pela sessão
-      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      // 3. Checa se agora existe uma sessão (seja pelo code ou pelo redirect automático)
+      const { data: { session } } = await supabase.auth.getSession();
 
-      if (error) {
-        console.error("Erro na troca de código:", error.message);
+      if (!session) {
         setMessage("Link inválido ou expirado.");
       } else {
-        // Limpa a mensagem de erro caso a sessão seja válida
-        setMessage(""); 
+        setMessage(""); // Limpa qualquer erro se a sessão estiver ok!
       }
 
       setIsValidating(false);
     }
 
     validateSession();
-  }, []);
+  }, [supabase.auth]);
+
 
   async function handleUpdate() {
     setMessage("Atualizando...");
@@ -117,10 +116,11 @@ export default function ResetPasswordPage() {
         <button 
           onClick={handleUpdate} 
           className="button-primary w-full py-2 bg-white text-black rounded font-medium hover:bg-zinc-200 transition-colors"
-          disabled={!password || !!message.includes("inválido") || isSuccess}
+          // REMOVI a trava da mensagem "inválido" para teste
+          disabled={!password || isSuccess || isValidating}
           style={{ 
-            opacity: isSuccess ? 0.4 : 1, 
-            cursor: isSuccess ? "not-allowed" : "pointer" 
+            opacity: (isSuccess || isValidating) ? 0.4 : 1, 
+            cursor: (isSuccess || isValidating) ? "not-allowed" : "pointer" 
           }}
         >
           {isSuccess ? "Senha atualizada" : "Atualizar senha"}
