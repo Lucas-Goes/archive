@@ -3,9 +3,11 @@ import chromium from "@sparticuz/chromium";
 
 import { themes, ThemeName } from "@/components/share/themes";
 
-export const runtime = "nodejs"; // importante na Vercel
+export const runtime = "nodejs";
 
 export async function GET(req: Request) {
+  let browser;
+
   try {
     const { searchParams } = new URL(req.url);
 
@@ -22,26 +24,30 @@ export async function GET(req: Request) {
         : "dark";
 
     // -------------------------
-    // 1. ABRIR BROWSER (ADAPTADO)
+    // 1. BROWSER
     // -------------------------
-    const browser = await puppeteer.launch({
+    console.log("INICIANDO BROWSER...");
+
+    browser = await puppeteer.launch({
       args: chromium.args,
+      executablePath: await chromium.executablePath(),
+      headless: true,
       defaultViewport: {
         width: 360,
         height: 640,
         deviceScaleFactor: 3,
       },
-      executablePath: await chromium.executablePath()
     });
 
     const page = await browser.newPage();
 
     // -------------------------
-    // 2. URL DO PREVIEW
+    // 2. URL
     // -------------------------
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://archive-me.com";
+    const baseUrl =
+      process.env.NEXT_PUBLIC_SITE_URL || "https://archive-me.com";
 
-    console.log('OLHA_ISSO_MANO', baseUrl)    
+    console.log("BASE URL:", baseUrl);
 
     const url = `${baseUrl}/share-preview?title=${encodeURIComponent(
       title
@@ -49,55 +55,123 @@ export async function GET(req: Request) {
       username
     )}&status=${status}&type=${type}&rating=${rating}&theme=${theme}`;
 
-    const response = await page.goto(url, {
-      waitUntil: "domcontentloaded",
-    });
+    console.log("URL FINAL:", url);
+
+    // -------------------------
+    // 3. ABRIR PÁGINA
+    // -------------------------
+    console.log("ABRINDO PÁGINA...");
 
     await page.goto(url, {
-      waitUntil: "networkidle0",
+      waitUntil: "domcontentloaded",
+      timeout: 30000,
     });
 
-    // -------------------------
-    // 3. PEGAR ELEMENTO
-    // -------------------------
-    await new Promise((r) => setTimeout(r, 500));
+    console.log("ABRIU PAGINA");
 
+    // -------------------------
+    // 4. ESPERAR ELEMENTO
+    // -------------------------
     await page.waitForSelector("#share-card", {
       timeout: 15000,
     });
 
-    
+    console.log("ELEMENTO EXISTE");
+
+    // -------------------------
+    // 5. ESPERAR IMAGENS
+    // -------------------------
+    await page.evaluate(async () => {
+      const images = Array.from(document.images);
+
+      await Promise.all(
+        images.map((img) => {
+          if (img.complete) return;
+
+          return new Promise((resolve) => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        })
+      );
+    });
+
+    console.log("IMAGENS OK");
+
+    // -------------------------
+    // 6. ESPERAR FONTES
+    // -------------------------
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+    });
+
+    console.log("FONTES OK");
+
+    // -------------------------
+    // 7. DELAY FINAL
+    // -------------------------
+    await new Promise((r) => setTimeout(r, 300));
+
+    // -------------------------
+    // 8. PEGAR ELEMENTO
+    // -------------------------
+    console.log("PEGANDO ELEMENT...");
+
     const element = await page.$("#share-card");
 
     if (!element) {
       throw new Error("Share card not found");
     }
 
+    console.log("PEGOU ELEMENT");
+
     // -------------------------
-    // 4. SCREENSHOT
+    // 9. SCREENSHOT
     // -------------------------
+    console.log("GERANDO SCREENSHOT...");
+
     const screenshot = await element.screenshot({
       type: "png",
     });
 
-    await browser.close();
+    console.log("SCREENSHOT OK");
 
     // -------------------------
-    // 5. RESPONSE
+    // 10. NORMALIZAR BUFFER (CRÍTICO)
     // -------------------------
-    const uint8 = new Uint8Array(screenshot as Uint8Array);
+    const buffer =
+      screenshot instanceof Buffer
+        ? screenshot
+        : Buffer.from(screenshot as Uint8Array);
 
-    return new Response(uint8, {
+    console.log("BUFFER OK:", buffer.length);
+
+    // -------------------------
+    // 11. RESPONSE
+    // -------------------------
+    return new Response(buffer, {
       headers: {
         "Content-Type": "image/png",
+        "Cache-Control": "public, max-age=31536000, immutable",
       },
     });
 
   } catch (error) {
-    console.error(error);
+    console.error("ERRO COMPLETO:", error);
+    console.error("STACK:", (error as Error)?.stack);
 
     return new Response("Erro ao gerar imagem", {
       status: 500,
     });
+
+  } finally {
+    if (browser) {
+      try {
+        await browser.close();
+        console.log("BROWSER FECHADO");
+      } catch (e) {
+        console.error("ERRO AO FECHAR BROWSER:", e);
+      }
+    }
   }
 }
