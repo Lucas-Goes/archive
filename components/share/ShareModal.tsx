@@ -62,52 +62,55 @@ export function ShareModal({
   // SHARE
   // -------------------------
     async function handleShare() {
-      if (isExporting) return; // 🔥 evita clique duplo
+      if (isExporting) return;
 
       setIsExporting(true);
 
       try {
-      const url = `${window.location.origin}/api/share-image?title=${encodeURIComponent(
-        title
-      )}&username=${encodeURIComponent(
-        username
-      )}&status=${status}&type=${type}&rating=${rating ?? ""}&theme=${theme}`;
+        const url = `${window.location.origin}/api/share-image?title=${encodeURIComponent(
+          title
+        )}&username=${encodeURIComponent(
+          username
+        )}&status=${status}&type=${type}&rating=${rating ?? ""}&theme=${theme}`;
 
-        console.log("CLICK SHARE");
-        console.log("URL:", url);
         const response = await fetch(url);
-        console.log("RESPONSE:", response.status);
 
         if (!response.ok) {
           const text = await response.text();
-          console.error("API ERROR:", text);
-          alert("Erro ao gerar imagem");
+          alert(text);
           return;
         }
 
         const blob = await response.blob();
 
-        const file = new File([blob], "archive.png", {
-          type: "image/png",
-        });
-
-        if (navigator.share && navigator.canShare?.({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: "Archive",
+        // 👉 TENTA COMPARTILHAR
+        try {
+          const file = new File([blob], "archive.png", {
+            type: "image/png",
           });
-        } else {
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(blob);
-          link.download = "archive.png";
-          link.click();
+
+          if (navigator.share && navigator.canShare?.({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: "Archive",
+            });
+            return;
+          }
+        } catch (e) {
+          console.log("share falhou, fallback download");
         }
+
+        // 👉 FALLBACK (SEMPRE FUNCIONA)
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "archive.png";
+        link.click();
 
       } catch (err) {
         console.error(err);
         alert("Erro ao gerar imagem");
       } finally {
-        setIsExporting(false); // 🔥 sempre libera no final
+        setIsExporting(false);
       }
     }
  
