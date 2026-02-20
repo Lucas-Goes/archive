@@ -60,12 +60,12 @@ export async function GET(req: Request) {
     // -------------------------
     // 3. PEGAR ELEMENTO
     // -------------------------
+    await new Promise((r) => setTimeout(r, 500));
+
     await page.waitForSelector("#share-card", {
       timeout: 15000,
     });
 
-    // pequeno delay pra garantir layout
-    await new Promise((r) => setTimeout(r, 500));
     
     const element = await page.$("#share-card");
 
