@@ -1,0 +1,61 @@
+[33m5758267[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Iniciando nova tentativa de ajuste Geral 1.5 novo arquivo ajuste googlefonts]
+[33me91af65[m Iniciando nova tentativa de ajuste Geral 1.5 novo arquivo route.ts
+[33mfe03e17[m Iniciando nova tentativa de ajuste Geral 1.4 share-image to share-preview
+[33mf1dfd18[m Iniciando nova tentativa de ajuste Geral 1.4 log pro card do Romeu is Dead Man
+[33ma9ea526[m Iniciando nova tentativa de ajuste Geral 1.3 ajuste route, share-preview, light e dark
+[33m218f124[m Iniciando nova tentativa de ajuste Geral 1.2 route.ts mais ajustes
+[33me09671c[m Iniciando nova tentativa de ajuste Geral 1.1 Ajuste arquivo route.ts inteiro
+[33m92dad21[m Iniciando nova tentativa de ajuste Geral 1.0 - add route.tsx -> route.ts
+[33mcf87a43[m Iniciando nova tentativa de ajuste Geral 1.0 - add domcontentloaded
+[33m842ccd3[m Restaurando estado do commit 2d22314
+[33m7e26874[m Restaurando estado do commit c715e79
+[33m108b2ed[m Restaurando estado do commit 952988c
+[33me9347f0[m Tentando voltar pra versao que tava funcionando 1.2
+[33mb9177c4[m Tentando voltar pra versao que tava funcionando 1.1
+[33m5c4c096[m Tentando voltar pra versao que tava funcionando 1.0
+[33m2d22314[m teste voltando pra puppeteer dnv 2.0 consturl
+[33mc715e79[m teste voltando pra puppeteer dnv 1.9 + Themas
+[33m952988c[m teste voltando pra puppeteer dnv 1.8 + front ShareModal
+[33m19e7106[m teste voltando pra puppeteer dnv 1.7 + front ShareModal
+[33m1fbde56[m teste voltando pra puppeteer dnv 1.6 + front ShareModal
+[33mf3dffc1[m teste voltando pra puppeteer dnv 1.5
+[33mf71ce48[m teste voltando pra puppeteer dnv 1.4 voltando pra versao 1.2
+[33me6a36f0[m Revert "teste voltando pra puppeteer dnv 1.2"
+[33m0e9bc99[m teste voltando pra puppeteer dnv 1.2
+[33m4f2aafd[m teste voltando pra puppeteer dnv 1.1
+[33mf7b810e[m teste voltando pra puppeteer dnv 1.0
+[33m087ba9d[m teste voltando pra puppeteer dnv 3
+[33maba504a[m teste voltando pra puppeteer dnv 3
+[33mac9cbc2[m teste voltando pra puppeteer dnv 2
+[33m878543c[m teste voltando pra puppeteer dnv
+[33m0489fdb[m teste vercelog 3 e registerForm
+[33m4045e0e[m teste vercelog 2
+[33m0444584[m teste vercelog
+[33mf059386[m fix puppeteer e route 22
+[33m533f582[m fix puppeteer e route 22
+[33mf1ff4cf[m fix puppeteer types denovo
+[33m6b63538[m fix puppeteer e route
+[33m013c201[m fix registerForm redirect
+[33m63c8cdc[m fix puppeteer types
+[33m06bda30[m fiz puppeteer core for vercel
+[33m24d1ebe[m add eye register button 2
+[33m7fd5685[m add eye register button
+[33m37c28d9[m alterar button e use effect
+[33m64e1623[m alterar useeffect
+[33m8ffc88d[m nao é hash, é code e usando fluxo de token antigo em link PKCE
+[33mb70e193[m fix reset password usando hash
+[33m35e4269[m fix reset password redirect no auth
+[33m3a54368[m callback confirmar email
+[33m3af6ae2[m Tela de Confirmar Email e Redirect
+[33m683f947[m fix de um monte de coisa maluca
+[33m7c755c3[m test deploy Ensure 2
+[33m666d85e[m test deploy Ensure
+[33m02bc30e[m fix register response type e Teste Deploy
+[33m36a57b6[m fix register response type 2
+[33m110c348[m fix register response type
+[33m5e230ee[m test deploy 2
+[33m1e9f86d[m test deploy
+[33m2442deb[m ajuste do register com bug de syncUser e criacao de fluxo de create usuario unificado
+[33m33987f4[m redirect vercel domain
+[33mc5d2a9d[m fix reset password build
+[33m6b89723[m initial commit
