@@ -3,7 +3,7 @@ import chromium from "@sparticuz/chromium";
 
 import { themes, ThemeName } from "@/components/share/themes";
 
-export const runtime = "nodejs";
+export const runtime = "nodejs"; // importante na Vercel
 
 export async function GET(req: Request) {
   try {
@@ -22,7 +22,7 @@ export async function GET(req: Request) {
         : "dark";
 
     // -------------------------
-    // 1. BROWSER
+    // 1. ABRIR BROWSER (ADAPTADO)
     // -------------------------
     const browser = await puppeteer.launch({
       args: chromium.args,
@@ -31,17 +31,17 @@ export async function GET(req: Request) {
         height: 640,
         deviceScaleFactor: 3,
       },
-      executablePath: await chromium.executablePath(),
-      headless: true,
+      executablePath: await chromium.executablePath()
     });
 
     const page = await browser.newPage();
 
     // -------------------------
-    // 2. URL
+    // 2. URL DO PREVIEW
     // -------------------------
-    const baseUrl =
-      process.env.NEXT_PUBLIC_SITE_URL || "https://archive-me.com";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://archive-me.com";
+
+    console.log('OLHA_ISSO_MANO', baseUrl)    
 
     const url = `${baseUrl}/share-preview?title=${encodeURIComponent(
       title
@@ -49,51 +49,24 @@ export async function GET(req: Request) {
       username
     )}&status=${status}&type=${type}&rating=${rating}&theme=${theme}`;
 
-    // -------------------------
-    // 3. ABRIR PÁGINA
-    // -------------------------
-    await page.goto(url, {
+    const response = await page.goto(url, {
       waitUntil: "domcontentloaded",
     });
 
+    await page.goto(url, {
+      waitUntil: "networkidle0",
+    });
+
     // -------------------------
-    // 4. ESPERAR ELEMENTO
+    // 3. PEGAR ELEMENTO
     // -------------------------
     await page.waitForSelector("#share-card", {
       timeout: 15000,
     });
 
-    // -------------------------
-    // 5. ESPERAR IMAGENS
-    // -------------------------
-    await page.evaluate(async () => {
-      const images = Array.from(document.images);
-      await Promise.all(
-        images.map((img) => {
-          if (img.complete) return;
-          return new Promise((resolve) => {
-            img.onload = resolve;
-            img.onerror = resolve;
-          });
-        })
-      );
-    });
-
-    // -------------------------
-    // 6. ESPERAR FONTES
-    // -------------------------
-    await page.evaluate(async () => {
-      await document.fonts.ready;
-    });
-
-    // -------------------------
-    // 7. DELAY FINAL
-    // -------------------------
-    await new Promise((r) => setTimeout(r, 300));
-
-    // -------------------------
-    // 8. PEGAR ELEMENTO (AGORA SIM)
-    // -------------------------
+    // pequeno delay pra garantir layout
+    await new Promise((r) => setTimeout(r, 500));
+    
     const element = await page.$("#share-card");
 
     if (!element) {
@@ -101,7 +74,7 @@ export async function GET(req: Request) {
     }
 
     // -------------------------
-    // 9. SCREENSHOT
+    // 4. SCREENSHOT
     // -------------------------
     const screenshot = await element.screenshot({
       type: "png",
@@ -109,7 +82,12 @@ export async function GET(req: Request) {
 
     await browser.close();
 
-    return new Response(new Uint8Array(screenshot as Uint8Array), {
+    // -------------------------
+    // 5. RESPONSE
+    // -------------------------
+    const uint8 = new Uint8Array(screenshot as Uint8Array);
+
+    return new Response(uint8, {
       headers: {
         "Content-Type": "image/png",
       },
@@ -117,6 +95,7 @@ export async function GET(req: Request) {
 
   } catch (error) {
     console.error(error);
+
     return new Response("Erro ao gerar imagem", {
       status: 500,
     });
