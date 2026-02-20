@@ -12,11 +12,14 @@ export async function getBrowser() {
     });
   }
 
-
   const executablePath = await chromium.executablePath();
 
   return puppeteer.launch({
-    args: chromium.args,
+    args: [
+      ...chromium.args,
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+    ],
     executablePath,
     headless: true,
     defaultViewport: { width: 1200, height: 630 },
