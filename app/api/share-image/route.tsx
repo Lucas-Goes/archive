@@ -152,7 +152,7 @@ export async function GET(req: Request) {
     return new Response(buffer, {
       headers: {
         "Content-Type": "image/png",
-        "Cache-Control": "public, max-age=31536000, immutable",
+        "Content-Length": buffer.length.toString(),
       },
     });
 

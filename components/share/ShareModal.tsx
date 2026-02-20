@@ -62,38 +62,49 @@ export function ShareModal({
   // SHARE
   // -------------------------
     async function handleShare() {
-    try {
-    const url = `/api/share-image?title=${encodeURIComponent(
-    title
-    )}&username=${encodeURIComponent(
-    username
-    )}&status=${status}&type=${type}&rating=${rating ?? ""}&theme=${theme}`;
+      if (isExporting) return; // 🔥 evita clique duplo
+
+      setIsExporting(true);
+
+      try {
+        const url = `/api/share-image?title=${encodeURIComponent(
+          title
+        )}&username=${encodeURIComponent(
+          username
+        )}&status=${status}&type=${type}&rating=${rating ?? ""}&theme=${theme}`;
 
         const response = await fetch(url);
+
+        if (!response.ok) {
+          const text = await response.text();
+          console.error("API ERROR:", text);
+          alert("Erro ao gerar imagem");
+          return;
+        }
 
         const blob = await response.blob();
 
         const file = new File([blob], "archive.png", {
-        type: "image/png",
+          type: "image/png",
         });
 
-        // native share (mobile)
         if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({
+          await navigator.share({
             files: [file],
             title: "Archive",
-        });
+          });
         } else {
-        // fallback download
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "archive.png";
-        link.click();
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = "archive.png";
+          link.click();
         }
-    } catch (err) {
+      } catch (err) {
         console.error(err);
         alert("Erro ao gerar imagem");
-    }
+      } finally {
+        setIsExporting(false); // 🔥 sempre libera no final
+      }
     }
  
   return (
@@ -179,15 +190,13 @@ export function ShareModal({
     </AnimatePresence>
 
     {/* BOTÃO */}
-    <button
+      <button
         onClick={handleShare}
-        className="w-full py-3 rounded-lg border text-sm transition hover:bg-white/5"
-        style={{
-        borderColor: "rgba(255,255,255,0.1)",
-        }}
-    >
-        Compartilhar
-    </button>
+        disabled={isExporting}
+        className="w-full py-3 rounded-lg border text-sm transition hover:bg-white/5 disabled:opacity-50"
+      >
+        {isExporting ? "Gerando..." : "Compartilhar"}
+      </button>
 
       </div>
     </div>
