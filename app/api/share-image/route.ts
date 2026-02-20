@@ -55,56 +55,61 @@ export async function GET(req: Request) {
     });
 
     // -------------------------
-    // 4. ESPERAR CARD EXISTIR
-    // -------------------------
-    await page.waitForSelector("#share-card", {
-      visible: true,
-      timeout: 20000,
+// ESPERAR CARD
+// -------------------------
+await page.waitForSelector("#share-card", {
+  visible: true,
+  timeout: 20000,
+});
+
+// -------------------------
+// ESPERAR TEXTO + LAYOUT
+// -------------------------
+await page.waitForFunction(() => {
+  const el = document.querySelector("#share-card") as HTMLElement | null;
+  if (!el) return false;
+
+  const hasText = el.innerText && el.innerText.length > 10;
+  const rect = el.getBoundingClientRect();
+
+  return hasText && rect.width > 0 && rect.height > 0;
+});
+
+// -------------------------
+// ESPERAR IMAGENS
+// -------------------------
+await page.waitForFunction(() => {
+  const images = Array.from(document.images);
+  return images.every((img) => img.complete);
+}, { timeout: 30000 });
+
+// -------------------------
+// ESPERAR IMAGEM REAL
+// -------------------------
+await page.waitForFunction(() => {
+  const img = document.querySelector("img");
+  if (!img) return true;
+
+  return img.naturalWidth > 0;
+});
+
+// -------------------------
+// ESPERAR FONTES
+// -------------------------
+await page.evaluate(async () => {
+  await document.fonts.ready;
+});
+
+// -------------------------
+// ESPERAR PAINT FINAL
+// -------------------------
+await page.evaluate(() => {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(resolve);
     });
-
-    // -------------------------
-    // 5. ESPERAR REACT FINALIZAR
-    // -------------------------
-    await page.waitForFunction(() => {
-      const el = document.querySelector("#share-card");
-      return el?.getAttribute("data-ready") === "true";
-    });
-
-    // -------------------------
-    // 6. ESPERAR IMAGENS
-    // -------------------------
-    await page.evaluate(async () => {
-      const images = Array.from(document.images);
-
-      await Promise.all(
-        images.map((img) => {
-          if (img.complete) return;
-
-          return new Promise((resolve) => {
-            img.onload = resolve;
-            img.onerror = resolve;
-          });
-        })
-      );
-    });
-
-    // -------------------------
-    // 7. ESPERAR FONTES
-    // -------------------------
-    await page.evaluate(async () => {
-      await document.fonts.ready;
-    });
-
-    // -------------------------
-    // 8. GARANTIR PAINT FINAL
-    // -------------------------
-    await page.evaluate(() => {
-      return new Promise((resolve) => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(resolve);
-        });
-      });
-    });
+  });
+});
 
     // -------------------------
     // 9. SCREENSHOT
