@@ -32,7 +32,9 @@ export async function registerUser(
 ): Promise<RegisterResponse> {
   const supabase = await createClient();
 
-  const email = formData.get("email") as string;
+  const email = (formData.get("email") as string)
+  .toLowerCase()
+  .trim();
   const password = formData.get("password") as string;
   const username = (formData.get("username") as string)
     .toLowerCase()

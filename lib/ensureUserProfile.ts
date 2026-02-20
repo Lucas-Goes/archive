@@ -22,11 +22,13 @@ export async function ensureUserProfile() {
 
   if (existing) return;
 
+  const searchEmail = user.email?.trim().toLowerCase() ?? '';
+  
   // busca pending
   const { data: pending, error: pendingError } = await supabase
     .from("pending_users")
     .select("*")
-    .eq("email", user.email)
+    .ilike("email", searchEmail)
     .maybeSingle();
 
   console.log("PENDING:", pending);
