@@ -89,20 +89,15 @@ export function RegisterForm({ onSuccess }: Props) {
 
     const res = await registerUser(formData);
 
-    if (res?.error) {
+    if (res && "success" in res && res.success) {
+      router.push(`/${res.username}`);
+    } else if (res && "error" in res) {
       setError(res.error);
-      setLoading(false);
-      return;
     }
 
     onSuccess?.();
 
     router.refresh();
-
-    // 🔥 fallback seguro caso res.username não exista
-    if (res?.username) {
-      router.push(`/${res.username}`);
-    }
 
     setLoading(false);
   }

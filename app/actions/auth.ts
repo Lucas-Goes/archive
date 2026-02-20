@@ -1,9 +1,17 @@
 "use server";
 
 import { createClient } from "@/lib/supabase-server";
-import { redirect } from "next/navigation";
 
+/* =====================================================
+  TYPES
+===================================================== */
+type RegisterResponse =
+  | { success: true; username: string }
+  | { error: string };
 
+/* =====================================================
+  HELPERS
+===================================================== */
 function translateAuthError(message: string) {
   if (message.includes("Password")) {
     return "A senha deve ter pelo menos 6 caracteres";
@@ -16,23 +24,32 @@ function translateAuthError(message: string) {
   return message;
 }
 
-export async function registerUser(formData: FormData) {
+/* =====================================================
+  REGISTER
+===================================================== */
+export async function registerUser(
+  formData: FormData
+): Promise<RegisterResponse> {
   const supabase = await createClient();
 
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const username = (formData.get("username") as string)
-  .toLowerCase()
-  .trim();
+    .toLowerCase()
+    .trim();
   const name = formData.get("name") as string;
   const bio = (formData.get("bio") as string) || "";
 
-  // validar campos
+  /* =========================
+    VALIDATION
+  ========================= */
   if (!email || !password || !username || !name) {
     return { error: "Preencha todos os campos" };
   }
 
-  // 🔐 verificar username
+  /* =========================
+    CHECK USERNAME
+  ========================= */
   const { data: existingUser } = await supabase
     .from("users")
     .select("id")
@@ -43,18 +60,22 @@ export async function registerUser(formData: FormData) {
     return { error: "Username já existe" };
   }
 
-  // verificar email existente
-const { data: existingEmail } = await supabase
-  .from("users")
-  .select("id")
-  .eq("email", email)
-  .maybeSingle();
+  /* =========================
+    CHECK EMAIL
+  ========================= */
+  const { data: existingEmail } = await supabase
+    .from("users")
+    .select("id")
+    .eq("email", email)
+    .maybeSingle();
 
-if (existingEmail) {
-  return { error: "Email já está em uso" };
-}
+  if (existingEmail) {
+    return { error: "Email já está em uso" };
+  }
 
-  // criar usuário auth
+  /* =========================
+    CREATE AUTH USER
+  ========================= */
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -64,24 +85,42 @@ if (existingEmail) {
     return { error: translateAuthError(error?.message || "") };
   }
 
-  const userId = data.user.id;
+  /* =========================
+    SAVE TEMP USER
+  ========================= */
+  const { error: pendingError } = await supabase
+    .from("pending_users")
+    .insert({
+      email,
+      username,
+      name,
+      bio,
+    });
 
-  // 🔥 salvar temporário
-  await supabase.from("pending_users").insert({
-    email,
+  if (pendingError) {
+    return { error: "Erro ao salvar dados temporários" };
+  }
+
+  /* =========================
+    SUCCESS
+  ========================= */
+  return {
+    success: true,
     username,
-    name,
-    bio,
-  });
-
+  };
 }
 
+/* =====================================================
+  LOGOUT
+===================================================== */
 export async function logout() {
   const supabase = await createClient();
-
   await supabase.auth.signOut();
 }
 
+/* =====================================================
+  RESET PASSWORD
+===================================================== */
 export async function resetPassword(email: string) {
   const supabase = await createClient();
 
