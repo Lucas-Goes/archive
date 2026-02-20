@@ -90,7 +90,7 @@ export function RegisterForm({ onSuccess }: Props) {
     const res = await registerUser(formData);
 
     if (res && "success" in res && res.success) {
-      router.push(`/`); //mandar pra tela de CONFIRMAR EMAIL
+      router.push("/check-email"); //mandar pra tela de CONFIRMAR EMAIL
     } else if (res && "error" in res) {
       setError(res.error);
     }
