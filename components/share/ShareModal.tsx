@@ -91,7 +91,7 @@ export function ShareModal({
         .replace(/[^a-z0-9]/gi, "-") // remove caracteres estranhos
         .replace(/-+/g, "-"); // evita múltiplos -
 
-        const fileName = `${username}-${safeTitle}.png`; 
+        const fileName = `archive_from_${username}-${safeTitle}.png`; 
         
 
         if (isMobile && navigator.share) {

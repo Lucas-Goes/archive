@@ -13,7 +13,7 @@ export async function GET(req: Request) {
     const username = searchParams.get("username") || "user";
     const status = searchParams.get("status") || "finished";
     const type = searchParams.get("type") || "movie";
-    const rating = searchParams.get("rating") || "";
+    const rating = searchParams.get("rating") || "rating";
     const theme = searchParams.get("theme") || "dark";
 
     // URL da página que será printada
