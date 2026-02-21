@@ -102,6 +102,7 @@ export function EditWorkModal({ work, open, onClose, }: EditWorkModalProps) {
             <option value="book">Livro</option>
             <option value="game">Jogo</option>
             <option value="anime">Anime</option>
+            <option value="manga">Mangá</option>
             <option value="hq">HQ</option>
           </select>
 
