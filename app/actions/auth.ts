@@ -12,6 +12,10 @@ type RegisterResponse =
 /* =====================================================
   HELPERS
 ===================================================== */
+function normalize(value: string) {
+  return value.toLowerCase().trim();
+}
+
 function translateAuthError(message: string) {
   if (message.includes("Password")) {
     return "A senha deve ter pelo menos 6 caracteres";
@@ -32,15 +36,11 @@ export async function registerUser(
 ): Promise<RegisterResponse> {
   const supabase = await createClient();
 
-  const email = (formData.get("email") as string)
-  .toLowerCase()
-  .trim();
+  const email = normalize(formData.get("email") as string);
   const password = formData.get("password") as string;
-  const username = (formData.get("username") as string)
-    .toLowerCase()
-    .trim();
-  const name = formData.get("name") as string;
-  const bio = (formData.get("bio") as string) || "";
+  const username = normalize(formData.get("username") as string);
+  const name = (formData.get("name") as string)?.trim();
+  const bio = (formData.get("bio") as string)?.trim() || "";
 
   /* =========================
     VALIDATION
@@ -49,42 +49,78 @@ export async function registerUser(
     return { error: "Preencha todos os campos" };
   }
 
-  /* =========================
-    CHECK USERNAME
-  ========================= */
-  const { data: existingUser } = await supabase
-    .from("users")
-    .select("id")
-    .eq("username", username)
-    .maybeSingle();
-
-  if (existingUser) {
-    return { error: "Username já existe" };
+  if (password.length < 6) {
+    return { error: "A senha deve ter pelo menos 6 caracteres" };
   }
 
   /* =========================
-    CHECK EMAIL
+    CHECK USERNAME (GLOBAL)
   ========================= */
-  const { data: existingEmail } = await supabase
+  // Se você já tem essa RPC, ela é o melhor lugar pra validar tudo
+  const { data: isTaken, error: rpcError } = await supabase.rpc(
+    "is_username_taken",
+    {
+      p_username: username,
+    }
+  );
+
+  if (rpcError) {
+    console.error("RPC error:", rpcError);
+    return { error: "Erro ao validar username" };
+  }
+
+  if (isTaken) {
+    return { error: "Username já está em uso" };
+  }
+
+  /* =========================
+    CHECK EMAIL (users)
+  ========================= */
+  const { data: existingEmail, error: emailError } = await supabase
     .from("users")
     .select("id")
     .eq("email", email)
-    .maybeSingle();
+    .limit(1);
 
-  if (existingEmail) {
+  if (emailError) {
+    console.error("Email check error:", emailError);
+    return { error: "Erro ao validar email" };
+  }
+
+  if (existingEmail && existingEmail.length > 0) {
     return { error: "Email já está em uso" };
+  }
+
+  /* =========================
+    CHECK PENDING USERS
+  ========================= */
+  const { data: existingPending, error: pendingCheckError } = await supabase
+    .from("pending_users")
+    .select("id")
+    .eq("username", username)
+    .limit(1);
+
+  if (pendingCheckError) {
+    console.error("Pending check error:", pendingCheckError);
+    return { error: "Erro ao validar username" };
+  }
+
+  if (existingPending && existingPending.length > 0) {
+    return { error: "Alguém teve essa ideia recentemente :)" };
   }
 
   /* =========================
     CREATE AUTH USER
   ========================= */
-  const { data, error } = await supabase.auth.signUp({
+  const { data, error: signUpError } = await supabase.auth.signUp({
     email,
     password,
   });
 
-  if (error || !data.user) {
-    return { error: translateAuthError(error?.message || "") };
+  if (signUpError || !data.user) {
+    return {
+      error: translateAuthError(signUpError?.message || "Erro ao criar usuário"),
+    };
   }
 
   /* =========================
@@ -92,46 +128,16 @@ export async function registerUser(
   ========================= */
   const { error: pendingError } = await supabase
     .from("pending_users")
-    .upsert(
-      {
-        email,
-        username,
-        name,
-        bio,
-      },
-      {
-        onConflict: "email",
-      }
-    );
+    .insert({
+      email,
+      username,
+      name,
+      bio,
+    });
 
   if (pendingError) {
+    console.error("Insert pending error:", pendingError);
     return { error: "Erro ao salvar dados temporários" };
-  }
-
-    /* =========================
-    CHECK PENDING
-  ========================= */
-  const { data: existingPending } = await supabase
-  .from("pending_users")
-  .select("id")
-  .eq("username", username)
-  .maybeSingle();
-
-  if (existingPending) {
-    return { error: "Alguém teve essa ideia recentemente :)" };
-  }
-
-
-/* =========================
-    consistência global
-  ========================= */
-
-  const { data: isTaken } = await supabase.rpc("is_username_taken", {
-    p_username: username,
-  });
-
-  if (isTaken) {
-    return { error: "Username já está em uso is_taken" };
   }
 
   /* =========================
