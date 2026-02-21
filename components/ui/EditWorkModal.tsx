@@ -98,6 +98,7 @@ export function EditWorkModal({ work, open, onClose, }: EditWorkModalProps) {
             }}
           >
             <option value="movie">Filme</option>
+            <option value="series">Série</option>
             <option value="book">Livro</option>
             <option value="game">Jogo</option>
             <option value="anime">Anime</option>
