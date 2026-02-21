@@ -44,7 +44,7 @@ export function LightTheme({
       style={{
         color: "#111",
         border: "1px solid rgba(0,0,0,0.08)",
-        fontFamily: "system-ui, -apple-system, sans-serif",
+        fontFamily: "Lexend, sans-serif",
       }}
     >
       {/* BACKGROUND IMAGE */}
