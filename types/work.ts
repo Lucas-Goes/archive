@@ -4,7 +4,7 @@ export type WorkType =
   | "book"
   | "game"
   | "anime"
-  | "manga";
+  | "hq";
 
 export type WorkStatus =
   | "in_progress"

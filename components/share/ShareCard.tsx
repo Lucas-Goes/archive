@@ -28,8 +28,8 @@ function formatType(type: string) {
       return "Livro";
     case "anime":
       return "Anime";
-    case "manga":
-      return "Mangá";
+    case "hq":
+      return "HQ";
     default:
       return type;
   }
@@ -41,7 +41,7 @@ function renderStars(rating: number) {
 
 function getHeadlineParts(status: string, type: string) {
   const isGame = type === "game";
-  const isReading = type === "book" || type === "manga";
+  const isReading = type === "book" || type === "hq";
 
   if (status === "want") {
     if (isGame) return ["Quero", "jogar"];

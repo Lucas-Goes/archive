@@ -14,7 +14,7 @@ export function ProfileStats({ works }: ProfileStatsProps) {
   }, {} as Record<string, number>);
 
   // ordem fixa (opcional)
-  const order = ["movie", "book", "game", "anime", "manga"];
+  const order = ["movie","series", "book", "game", "anime", "hq"];
 
   return (
     <div className="flex justify-center mt-0">
@@ -55,14 +55,16 @@ function formatType(type: string) {
   switch (type) {
     case "movie":
       return "Filmes";
+    case "series":
+      return "Série";      
     case "book":
       return "Livros";
     case "game":
       return "Jogos";
     case "anime":
       return "Animes";
-    case "manga":
-      return "Mangás";
+    case "hq":
+      return "HQ";
     default:
       return type;
   }

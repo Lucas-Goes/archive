@@ -267,7 +267,7 @@ export function WorkCard({ work, isOwner, username }: WorkCardProps) {
 
 function formatStatus(status: string, type: string) {
   const isGame = type === "game";
-  const isReading = type === "book" || type === "manga";
+  const isReading = type === "book" || type === "hq";
 
   switch (status) {
     case "want":
@@ -300,8 +300,8 @@ function formatType(type: string) {
       return "Livro";
     case "anime":
       return "Anime";
-    case "manga":
-      return "Mangá";
+    case "hq":
+      return "HQ";
     default:
       return type;
   }

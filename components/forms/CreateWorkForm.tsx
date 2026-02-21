@@ -30,7 +30,7 @@ export function CreateWorkForm() {
         <option value="book">Livro</option>
         <option value="game">Jogo</option>
         <option value="anime">Anime</option>
-        <option value="manga">Mangá</option>
+        <option value="hq">HQ</option>
       </select>
 
       <select name="status" className="w-full p-2 border rounded">
