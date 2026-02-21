@@ -132,13 +132,13 @@ export function DarkTheme({
         <div className="space-y-4 px-2">
 
           <div
-            className="flex justify-between text-sm"
+            className="flex justify-between text-sm font-bold"
             style={{ color: "rgba(255,255,255,0.6)" }}
           >
             <span>Categoria: {formatType(type)}</span>
 
             {rating !== undefined && rating !== null && (
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 font-bold">
               Nota
               <span className="flex items-center gap-[2px] ">
                 {Array.from({ length: typeof rating === "number" ? rating : 0 }).map((_, i) => (
