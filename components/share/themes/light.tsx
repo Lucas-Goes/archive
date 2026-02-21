@@ -86,26 +86,22 @@ export function LightTheme({
         {/* BOTTOM */}
         <div className="space-y-4 px-2">
 
-          <div className="text-[12px] font-bold flex justify-between text-sm text-black/60">
-            <span>Categoria: {type}</span>
-
-            {rating !== undefined && rating !== null && (
-              <span>
-                Nota 
-                    {Array.from({ length: typeof rating === "number" ? rating : 0 }).map((_, i) => (
-                      <svg
-                        key={i}
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="black"
-                      >
-                        <path d="M12 17.27L18.18 21 16.54 13.97 22 9.24 14.81 8.63 12 2 9.19 8.63 2 9.24 7.46 13.97 5.82 21z" />
-                      </svg>
-                    ))}
-              </span>
-            )}
-          </div>
+        <span className="flex items-center gap-1">
+          Nota
+          <span className="flex items-center gap-[2px]">
+            {Array.from({ length: typeof rating === "number" ? rating : 0 }).map((_, i) => (
+              <svg
+                key={i}
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="black"
+              >
+                <path d="M12 17.27L18.18 21 16.54 13.97 22 9.24 14.81 8.63 12 2 9.19 8.63 2 9.24 7.46 13.97 5.82 21z" />
+              </svg>
+            ))}
+          </span>
+        </span>
 
           {/* FOOTER */}
           <div className="relative mt-4">
