@@ -25,6 +25,8 @@ function formatType(type: string) {
       return "Livro";
     case "anime":
       return "Anime";
+    case "manga":
+      return "Manga";      
     case "hq":
       return "HQ";
     default:
