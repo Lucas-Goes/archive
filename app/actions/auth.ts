@@ -118,7 +118,7 @@ export async function registerUser(
   .maybeSingle();
 
   if (existingPending) {
-    return { error: "Username já está em uso" };
+    return { error: "Alguém teve essa ideia recentemente :)" };
   }
 
 
@@ -131,7 +131,7 @@ export async function registerUser(
   });
 
   if (isTaken) {
-    return { error: "Username já está em uso" };
+    return { error: "Username já está em uso is_taken" };
   }
 
   /* =========================
