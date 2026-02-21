@@ -22,15 +22,19 @@ export default async function SharePreviewPage({ searchParams }: Props) {
     username = "user",
     status = "finished",
     type = "movie",
-    rating = "rating",
+    rating,
     theme: themeParam
   } = params;
 
-    const theme: ThemeName =
+  const theme: ThemeName =
   themeParam && themeParam in themes
     ? (themeParam as ThemeName)
     : "dark";
 
+  const ratingNumber =
+  rating !== undefined && rating !== null && rating !== ""
+    ? Number(rating)
+    : undefined;
 
   return (
     <main
@@ -48,11 +52,7 @@ export default async function SharePreviewPage({ searchParams }: Props) {
         username={username}
         status={status}
         type={type}
-        rating={
-        rating !== undefined && rating !== null && rating !== ""
-          ? Number(rating)
-          : undefined
-        }
+        rating={ratingNumber}
         theme={theme}
       />
     </main>
