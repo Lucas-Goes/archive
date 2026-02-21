@@ -172,6 +172,7 @@ export function CreateWorkModal() {
                 <option value="book">Livro</option>
                 <option value="game">Jogo</option>
                 <option value="anime">Anime</option>
+                <option value="manga">MangAA</option>
                 <option value="hq">HQ</option>
               </select>
 
