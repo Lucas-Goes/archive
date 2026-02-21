@@ -64,7 +64,7 @@ function formatType(type: string) {
     case "anime":
       return "Animes";
     case "manga":
-      return "Manga";      
+      return "Mangá";      
     case "hq":
       return "HQ";
     default:

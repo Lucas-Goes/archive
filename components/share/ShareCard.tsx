@@ -29,7 +29,7 @@ function formatType(type: string) {
     case "anime":
       return "Anime";
     case "manga":
-      return "Manga";      
+      return "Mangá";      
     case "hq":
       return "HQ";
     default:
