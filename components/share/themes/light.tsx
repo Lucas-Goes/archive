@@ -95,7 +95,7 @@ export function LightTheme({
 
             {rating !== undefined && rating !== null && (
               <span>
-                Nota {"★".repeat(rating)}
+                Nota ★★★
               </span>
             )}
           </div>
