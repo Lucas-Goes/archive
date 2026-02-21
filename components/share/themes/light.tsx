@@ -103,12 +103,13 @@ export function LightTheme({
           </p>
 
         </div>
-        <div style={{ fontFamily: "Lexend, sans-serif", fontSize: 40 }}>
-  TESTEE J Q LEXEND
-</div>
 
         {/* BOTTOM */}
         <div className="space-y-4 px-2">
+
+          <div style={{ fontFamily: "Lexend, sans-serif", fontSize: 40 }}>
+            TESTEE J Q LEXEND
+          </div>
 
           <div className="flex justify-between text-sm font-bold text-black/60">
             
