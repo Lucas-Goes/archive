@@ -26,6 +26,7 @@ export function CreateWorkForm() {
 
       <select name="type" className="w-full p-2 border rounded">
         <option value="movie">Filme</option>
+        <option value="serie">Série</option>
         <option value="book">Livro</option>
         <option value="game">Jogo</option>
         <option value="anime">Anime</option>

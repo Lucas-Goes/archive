@@ -7,6 +7,9 @@ type Props = {
   line1: string;
   line2: string;
   formatType: (type: string) => string;
+    font: {
+    cssVar: string;
+  };
 };
 
 // -------------------------
@@ -36,6 +39,7 @@ export function LightTheme({
   rating,
   line1,
   line2,
+  font,
 }: Props) {
   return (
     <div
@@ -44,7 +48,7 @@ export function LightTheme({
       style={{
         color: "#111",
         border: "1px solid rgba(0,0,0,0.08)",
-        fontFamily: "var(--font-lexend)",
+        fontFamily: font.cssVar,
       }}
     >
       {/* BACKGROUND IMAGE */}
