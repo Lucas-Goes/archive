@@ -111,7 +111,7 @@ export function LightTheme({
             
             <span>Categoria: {formatType(type)}</span>
 
-            {rating !== undefined && rating !== null && (
+            {typeof rating === "number" && rating > 0 && (    
             <span className="flex items-center gap-1">
               Nota
               <span className="flex items-center gap-[2px] ">
