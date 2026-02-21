@@ -71,7 +71,7 @@ export function ShareModal({
           title
         )}&username=${encodeURIComponent(
           username
-        )}&status=${status}&type=${type}&rating=${rating ?? ""}&theme=${theme}`;
+        )}&status=${status}&type=${type}&rating=${rating ?? "0"}&theme=${theme}`;
 
         const response = await fetch(url);
 
