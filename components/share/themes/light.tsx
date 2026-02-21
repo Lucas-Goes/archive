@@ -90,7 +90,9 @@ export function LightTheme({
             <span>Categoria: {type}</span>
 
             {rating !== undefined && rating !== null && (
-              <span>Nota {"★★★★★".slice(0, rating)}</span>
+              <span>
+                Nota {"★★★★★".slice(0, typeof rating === "number" ? rating : 0)}
+              </span>
             )}
           </div>
 
