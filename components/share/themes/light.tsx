@@ -83,6 +83,10 @@ export function LightTheme({
 
         </div>
 
+        <div style={{ position: "absolute", top: 10, left: 10, color: "red" }}>
+  RATING: {String(rating)}
+</div>
+
         {/* BOTTOM */}
         <div className="space-y-4 px-2">
 
