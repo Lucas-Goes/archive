@@ -1,6 +1,7 @@
 export const fonts = {
   lexend: {
-    name: "Lexend",
+    cssVar: "var(--font-lexend)",
+    puppeteerName: "Lexend",
     file: "lexend.woff2",
   },
   //Arial: {
@@ -10,3 +11,4 @@ export const fonts = {
 };
 
 export type FontName = keyof typeof fonts;
+

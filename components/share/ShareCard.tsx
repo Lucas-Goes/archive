@@ -1,6 +1,7 @@
 //"use client";
 
 import { themes, ThemeName } from "./themes";
+import { fonts } from "./fonts";
 
 type Props = {
   title: string;
@@ -82,6 +83,8 @@ export function ShareCard({
   // 🔥 2. ESCOLHER TEMA
   const selectedTheme = themes[theme || "dark"];
   const ThemeComponent = selectedTheme.component as React.ComponentType<any>;
+  const fontKey = selectedTheme.font as keyof typeof fonts;
+  const font = fonts[fontKey];
 
   // 🔥 3. RENDERIZAR TEMA
   return (
@@ -96,6 +99,7 @@ export function ShareCard({
         line2={line2}
         formatType={formatType}
         renderStars={renderStars}
+        font={font}
       />
     </div>
   );

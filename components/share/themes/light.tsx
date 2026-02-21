@@ -44,7 +44,7 @@ export function LightTheme({
       style={{
         color: "#111",
         border: "1px solid rgba(0,0,0,0.08)",
-        fontFamily: "Lexend, sans-serif",
+        fontFamily: "var(--font-lexend)",
       }}
     >
       {/* BACKGROUND IMAGE */}
@@ -106,10 +106,6 @@ export function LightTheme({
 
         {/* BOTTOM */}
         <div className="space-y-4 px-2">
-
-          <div style={{ fontFamily: "Lexend, sans-serif", fontSize: 40 }}>
-            TESTEE J Q LEXEND
-          </div>
 
           <div className="flex justify-between text-sm font-bold text-black/60">
             
