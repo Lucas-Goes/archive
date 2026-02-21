@@ -22,7 +22,7 @@ export default async function SharePreviewPage({ searchParams }: Props) {
     username = "user",
     status = "finished",
     type = "movie",
-    rating,
+    rating = "rating",
     theme: themeParam
   } = params;
 
