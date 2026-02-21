@@ -432,3 +432,14 @@ body {
 
   padding: 96px 0;
 }
+
+/* =====================================================
+  FONTES
+===================================================== */
+
+@font-face {
+  font-family: 'Lexend';
+  src: url('/fonts/lexend.woff2') format('woff2');
+}
+
+

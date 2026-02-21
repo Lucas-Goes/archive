@@ -35,8 +35,14 @@ export async function GET(req: Request) {
 
     // pega font do tema
     const selectedTheme = themes[theme];
+    type FontType = {
+      cssVar: string;
+      puppeteerName: string;
+      file: string;
+    };
+
     const fontKey = (selectedTheme?.font || "lexend") as keyof typeof fonts;
-    const font = fonts[fontKey];
+    const font: FontType = fonts[fontKey];
 
     // abre browser
     browser = await puppeteer.launch({
@@ -67,7 +73,7 @@ export async function GET(req: Request) {
       await page.addStyleTag({
         content: `
           @font-face {
-            font-family: '${font.name}';
+            font-family: '${font.puppeteerName}';
             src: url('${baseUrl}/fonts/${font.file}') format('woff2');
             font-weight: 100 900;
             font-style: normal;
