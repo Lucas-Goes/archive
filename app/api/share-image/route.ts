@@ -51,6 +51,20 @@ export async function GET(req: Request) {
     await page.waitForSelector("#share-card", { timeout: 10000 });
 
     // espera fontes carregarem
+    await page.addStyleTag({
+      content: `
+        @font-face {
+          font-family: 'Lexend';
+          src: url('${baseUrl}/fonts/lexend.woff2') format('woff2');
+          font-weight: 100 900;
+          font-style: normal;
+        }
+
+        * {
+          font-family: 'Lexend', sans-serif !important;
+        }
+      `,
+    });
     await page.evaluate(() => document.fonts.ready);
 
     // pequeno delay pra garantir render
