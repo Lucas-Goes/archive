@@ -1,6 +1,9 @@
 import puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
 
+import { themes } from "@/components/share/themes";
+import { fonts } from "@/components/share/fonts";
+
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {
@@ -14,7 +17,11 @@ export async function GET(req: Request) {
     const status = searchParams.get("status") || "finished";
     const type = searchParams.get("type") || "movie";
     const rating = searchParams.get("rating") || "rating";
-    const theme = searchParams.get("theme") || "dark";
+    const themeParam = searchParams.get("theme") || "dark";
+
+    // valida tema
+    const theme =
+      themeParam in themes ? (themeParam as keyof typeof themes) : "dark";
 
     // URL da página que será printada
     const baseUrl =
@@ -25,6 +32,11 @@ export async function GET(req: Request) {
     )}&username=${encodeURIComponent(
       username
     )}&status=${status}&type=${type}&rating=${rating}&theme=${theme}`;
+
+    // pega font do tema
+    const selectedTheme = themes[theme];
+    const fontKey = (selectedTheme?.font || "lexend") as keyof typeof fonts;
+    const font = fonts[fontKey];
 
     // abre browser
     browser = await puppeteer.launch({
@@ -50,22 +62,22 @@ export async function GET(req: Request) {
     // espera o card existir
     await page.waitForSelector("#share-card", { timeout: 10000 });
 
-    // espera fontes carregarem
-    await page.addStyleTag({
-      content: `
-        @font-face {
-          font-family: 'Lexend';
-          src: url('${baseUrl}/fonts/lexend.woff2') format('woff2');
-          font-weight: 100 900;
-          font-style: normal;
-        }
+    // injeta apenas a font do tema
+    if (font) {
+      await page.addStyleTag({
+        content: `
+          @font-face {
+            font-family: '${font.name}';
+            src: url('${baseUrl}/fonts/${font.file}') format('woff2');
+            font-weight: 100 900;
+            font-style: normal;
+          }
+        `,
+      });
 
-        * {
-          font-family: 'Lexend', sans-serif !important;
-        }
-      `,
-    });
-    await page.evaluate(() => document.fonts.ready);
+      // espera carregar a font
+      await page.evaluate(() => document.fonts.ready);
+    }
 
     // pequeno delay pra garantir render
     await new Promise((r) => setTimeout(r, 300));
