@@ -80,7 +80,8 @@ export function ShareCard({
   const [line1, line2] = getHeadlineParts(status, type);
 
   // 🔥 2. ESCOLHER TEMA
-  const ThemeComponent = themes[theme || "dark"];
+  const selectedTheme = themes[theme || "dark"];
+  const ThemeComponent = selectedTheme.component as React.ComponentType<any>;
 
   // 🔥 3. RENDERIZAR TEMA
   return (
@@ -99,3 +100,4 @@ export function ShareCard({
     </div>
   );
 }
+
