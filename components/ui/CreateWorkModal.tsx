@@ -168,6 +168,7 @@ export function CreateWorkModal() {
                 }}
               >
                 <option value="movie">Filme</option>
+                <option value="serie">Série</option>
                 <option value="book">Livro</option>
                 <option value="game">Jogo</option>
                 <option value="anime">Anime</option>
