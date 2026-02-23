@@ -1,40 +1,42 @@
 import { useRef } from "react";
 
 export function useTap(onTap: () => void) {
-  const startY = useRef(0);
-  const isScrolling = useRef(false);
+  const startPos = useRef({ x: 0, y: 0 });
+  const isMoved = useRef(false);
 
   function onTouchStart(e: React.TouchEvent) {
-    startY.current = e.touches[0].clientY;
-    isScrolling.current = false;
+    isMoved.current = false;
+    startPos.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+    };
   }
 
   function onTouchMove(e: React.TouchEvent) {
-    const delta = Math.abs(e.touches[0].clientY - startY.current);
-    // Se mover mais de 10px, consideramos scroll e cancelamos o tap
-    if (delta > 10) {
-      isScrolling.current = true;
+    const deltaX = Math.abs(e.touches[0].clientX - startPos.current.x);
+    const deltaY = Math.abs(e.touches[0].clientY - startPos.current.y);
+
+    // Se mover mais de 10 pixels em qualquer direção, cancelamos o clique
+    if (deltaX > 10 || deltaY > 10) {
+      isMoved.current = true;
     }
   }
 
   function onTouchEnd(e: React.TouchEvent) {
-    if (!isScrolling.current) {
-      // Impede que o evento de clique fantasma do navegador dispare após o touch
-      if (e.cancelable) e.preventDefault();
+    if (!isMoved.current) {
+      // Opcional: e.preventDefault() aqui pode causar problemas se houver inputs dentro, 
+      // use com cautela. Removido para priorizar compatibilidade.
       onTap();
     }
-  }
-
-  // Fallback para Desktop
-  function onClick(e: React.MouseEvent) {
-    // Se não for touch (mouse comum), dispara o callback
-    onTap();
   }
 
   return {
     onTouchStart,
     onTouchMove,
     onTouchEnd,
-    onClick,
+    // No Desktop usamos onClick normal
+    onClick: (e: React.MouseEvent) => {
+      if (e.button === 0) onTap();
+    }
   };
 }

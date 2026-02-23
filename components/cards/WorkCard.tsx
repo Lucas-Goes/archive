@@ -11,6 +11,7 @@ import { CardMenu } from "@/components/ui/CardMenu";
 import { useState, useEffect, useRef } from "react";
 import { EditWorkModal } from "@/components/ui/EditWorkModal";
 import { ShareModal } from "@/components/share/ShareModal";
+import { useTap } from "@/lib/useTap";
 
 /* =====================================================
   TYPES
@@ -39,8 +40,14 @@ export function WorkCard({ work, isOwner, username }: WorkCardProps) {
     REFS
   ========================= */
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const pressTimer = useRef<NodeJS.Timeout | null>(null);
-  const longPressTriggered = useRef(false);
+
+  /* =========================
+    TAP HANDLER (FIX SCROLL BUG)
+  ========================= */
+  const tapHandlers = useTap(() => {
+    // 👉 ação principal do card (pode mudar depois pra SoftCard)
+    setOpenShare(true);
+  });
 
   /* =========================
     LAYOUT
@@ -60,7 +67,6 @@ export function WorkCard({ work, isOwner, username }: WorkCardProps) {
 
   const overlayIndex = getOverlayIndex(work.id) % 5;
   const overlayClass = `work-card-overlay overlay-${overlayIndex + 1}`;
-
 
   /* =====================================================
     ACTIONS
@@ -88,31 +94,7 @@ export function WorkCard({ work, isOwner, username }: WorkCardProps) {
   }
 
   /* =====================================================
-    MOBILE LONG PRESS
-  ===================================================== */
-
-  function handleTouchStart() {
-    longPressTriggered.current = false;
-
-    pressTimer.current = setTimeout(() => {
-      longPressTriggered.current = true;
-      setMenuOpen(true);
-    }, 500);
-  }
-
-  function handleTouchEnd() {
-    if (pressTimer.current) {
-      clearTimeout(pressTimer.current);
-      pressTimer.current = null;
-    }
-
-    if (!longPressTriggered.current) {
-      handleShare();
-    }
-  }
-
-  /* =====================================================
-    CLICK OUTSIDE
+    CLICK OUTSIDE MENU
   ===================================================== */
 
   useEffect(() => {
@@ -167,23 +149,21 @@ export function WorkCard({ work, isOwner, username }: WorkCardProps) {
         <div className="work-card-bg" />
 
         {/* OVERLAY */}
-        <div
-          className={overlayClass}
-        />
+        <div className={overlayClass} />
 
         {/* CARD */}
         <div
-          className="work-card group"
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
+          className="work-card group cursor-pointer"
+          {...tapHandlers}
         >
           {/* SHARE BUTTON */}
           {isOwner && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setOpenShare(true);
+                handleShare();
               }}
+              onTouchStart={(e) => e.stopPropagation()}
               className="card-button card-button-share"
             >
               ↗
@@ -197,6 +177,7 @@ export function WorkCard({ work, isOwner, username }: WorkCardProps) {
                 e.stopPropagation();
                 setMenuOpen((prev) => !prev);
               }}
+              onTouchStart={(e) => e.stopPropagation()}
               className="card-button card-button-menu"
             >
               ⋯
@@ -301,9 +282,9 @@ function formatType(type: string) {
     case "anime":
       return "Anime";
     case "manga":
-      return "Mangá";       
+      return "Mangá";
     case "hq":
-      return "HQ";     
+      return "HQ";
     default:
       return type;
   }
