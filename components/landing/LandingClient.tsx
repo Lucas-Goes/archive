@@ -19,11 +19,22 @@ export function LandingClient() {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % endings.length);
-    }, 6000); // pausa entre trocas
+    let interval: NodeJS.Timeout;
 
-    return () => clearInterval(interval);
+    const firstTimeout = setTimeout(() => {
+      // primeira troca rápida
+      setIndex((prev) => (prev + 1) % endings.length);
+
+      // depois mantém o ritmo normal
+      interval = setInterval(() => {
+        setIndex((prev) => (prev + 1) % endings.length);
+      }, 4000);
+    }, 1000);
+
+    return () => {
+      clearTimeout(firstTimeout);
+      if (interval) clearInterval(interval);
+    };
   }, []);
 
 
@@ -57,7 +68,7 @@ export function LandingClient() {
 
           <button
             onClick={() => setMode("register")}
-            className="text-sm px-3 py-2 rounded-full border border-white/5 bg-white/5 backdrop-blur-md text-white/70 hover:bg-white/10 hover:text-white transition"
+            className="text-sm px-8 py-2 md:px-6 rounded-full border border-white/5 bg-white/5 backdrop-blur-md text-white/70 hover:bg-white/10 hover:text-white transition "
           >
             Criar Archive
           </button>

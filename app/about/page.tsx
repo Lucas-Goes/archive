@@ -22,7 +22,7 @@ export default function AboutPage() {
 
           <Link
             href="/"
-            className="text-sm px-3 py-1 rounded-full border border-white/5 bg-white/5 backdrop-blur-md text-white/70 hover:bg-white/10 hover:text-white transition"
+            className="text-sm px-8 py-2 md:px-6 rounded-full border border-white/5 bg-white/5 backdrop-blur-md text-white/70 hover:bg-white/10 hover:text-white transition "
           >
             Voltar
           </Link>
@@ -30,31 +30,39 @@ export default function AboutPage() {
         </header>
 
         {/* CONTENT */}
-        <div className="py-24">
+        <div className="py-1">
 
-          <div className="max-w-lg w-full pl-4 md:pl-12">
+          <div className="max-w-lg w-full pl-4 border-l border-white/10">
 
             {/* BLOCO PRINCIPAL */}
-            <div className="text-base md:text-lg text-white/90 leading-relaxed space-y-1">
+            <div className="text-base md:text-sm text-white/90 leading-relaxed space-y-1">
 
               <p>Archive não é uma ferramenta de organização.</p>
               <p>Não é sobre controlar o que você viu.</p>
-              <p>Não é sobre transformar memória em dado.</p>
-              <p>É um espaço silencioso, onde as coisas podem existir sem precisar justificar presença.</p>
+              <p>Nem transformar memória em palco.</p>
 
-              <p>O que você viu, jogou, leu.</p>
-              <p>O que te atravessou de alguma forma.</p>
-              <p>Nem tudo permanece, mas quase sempre algo fica.</p>
+              <p>É um espaço silencioso.</p>
+              <p>Um lugar para existir.</p>
+              <p>Sem precisar justificar presença.</p>
+
+              <p>O que você viu, leu, jogou.</p>
+              <p>O que ficou com você de alguma forma.</p>
+
+              <p>Nada permanece inteiro.</p>
+              <p>Mas algo sempre fica.</p>
+
               <p>Archive existe para isso.</p>
-              <p>Não para medir, mas para guardar.</p>
+              <p>Não para medir.</p>
+              <p>Para guardar.</p>
 
-              <p>Não é o lugar para ser performático.</p>
-              <p>Não há métricas, ranking ou exposição.</p>
+              <p>Aqui não há métricas nem rankings sociais.</p>
+              <p>Não há performance.</p>
+              <p>Não é pela razão! É pela emoção.</p>
 
             </div>
 
             {/* CONCEITO */}
-            <div className="mt-16 flex items-baseline gap-4">
+            <div className="mt-8 flex items-baseline gap-4">
 
               <span className="text-sm text-white/40 tracking-wide">
                 mono no aware
