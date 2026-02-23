@@ -32,7 +32,7 @@ export function LandingClient() {
   }
 
   return (
-    <main className="relative h-screen md:min-h-screen bg-black text-white overflow-hidden">
+    <main className="relative h-dvh md:min-h-screen bg-black text-white overflow-hidden">
 
       {/* BACKGROUND BASE */}
       <div className="absolute inset-0 bg-black pointer-events-none" />
