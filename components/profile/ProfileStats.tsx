@@ -19,7 +19,7 @@ export function ProfileStats({ works }: ProfileStatsProps) {
   return (
     <div className="flex justify-center mt-0">
       <div
-        className="flex gap-6 px-6 py-4 text-sm mt-0 justify-center"
+        className="flex flex-wrap gap-6 px-6 py-4 text-sm mt-0 justify-center"
         style={{
         borderTop: "1px solid var(--border)",
         borderBottom: "1px solid var(--border)",

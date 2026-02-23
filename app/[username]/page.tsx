@@ -65,7 +65,7 @@ export default async function PublicProfilePage({
   ===================================================== */
   return (
     <main className="page">
-      <div className="page-container">
+      <div className="page-container w-full max-w-5xl mx-auto">
         
         {/* =====================================================
           FLOATING ACTIONS (TOP RIGHT)
@@ -106,7 +106,7 @@ export default async function PublicProfilePage({
         <ProfileStats works={works} />
 
         {/* =====================================================
-          WORK GRID / EMPTY STATE
+          WORK GRID / EMPTY STATE 
         ===================================================== */}
         <section className="works-section">
           {works && works.length > 0 ? (
