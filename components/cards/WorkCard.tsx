@@ -13,7 +13,7 @@ import { EditWorkModal } from "@/components/ui/EditWorkModal";
 import { ShareModal } from "@/components/share/ShareModal";
 import { useTap } from "@/lib/useTap";
 import { SoftCard } from "@/components/ui/SoftCard";
-import { WorkCardPreview } from "@/components/cards/WorkCardPreview";
+
 
 /* =====================================================
   TYPES
