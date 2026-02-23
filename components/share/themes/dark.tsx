@@ -176,7 +176,7 @@ export function DarkTheme({
                 borderTop: "1px solid rgba(255,255,255,0.1)",
               }}
             >
-              archive-me.app/{username}
+              archive-me.com/{username}
             </div>
           </div>
 

@@ -156,7 +156,7 @@ export function LightTheme({
                 borderTop: "1px solid rgba(0,0,0,0.1)",
               }}
             >
-              archive-me.app/{username}
+              archive-me.com/{username}
             </div>
 
           </div>

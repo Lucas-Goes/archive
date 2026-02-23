@@ -12,6 +12,8 @@ import { useState, useEffect, useRef } from "react";
 import { EditWorkModal } from "@/components/ui/EditWorkModal";
 import { ShareModal } from "@/components/share/ShareModal";
 import { useTap } from "@/lib/useTap";
+import { SoftCard } from "@/components/ui/SoftCard";
+import { WorkCardPreview } from "@/components/cards/WorkCardPreview";
 
 /* =====================================================
   TYPES
@@ -35,6 +37,7 @@ export function WorkCard({ work, isOwner, username }: WorkCardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openShare, setOpenShare] = useState(false);
+  const [openSoft, setOpenSoft] = useState(false);
 
   /* =========================
     REFS
@@ -42,11 +45,13 @@ export function WorkCard({ work, isOwner, username }: WorkCardProps) {
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   /* =========================
-    TAP HANDLER (FIX SCROLL BUG)
+    TAP HANDLER
   ========================= */
   const tapHandlers = useTap(() => {
-    // 👉 ação principal do card (pode mudar depois pra SoftCard)
-    setOpenShare(true);
+    // 👉 evita conflito com menu
+    if (menuOpen) return;
+
+    setOpenSoft(true);
   });
 
   /* =========================
@@ -80,16 +85,19 @@ export function WorkCard({ work, isOwner, username }: WorkCardProps) {
   }
 
   function handleEdit() {
-    setOpenEdit(true);
     setMenuOpen(false);
+    setOpenSoft(false); // 🔥 importante
+    setOpenEdit(true);
   }
 
   function handleDeleteClick() {
     setMenuOpen(false);
+    setOpenSoft(false); // 🔥 importante
     setOpenDelete(true);
   }
 
   function handleShare() {
+    setOpenSoft(false); // 🔥 importante
     setOpenShare(true);
   }
 
@@ -124,6 +132,7 @@ export function WorkCard({ work, isOwner, username }: WorkCardProps) {
       if (e.key === "Escape") {
         setMenuOpen(false);
         setOpenDelete(false);
+        setOpenSoft(false);
       }
     }
 
@@ -140,23 +149,20 @@ export function WorkCard({ work, isOwner, username }: WorkCardProps) {
 
   return (
     <>
+      {/* CARD */}
       <div
         ref={menuRef}
         className="work-card-container"
         style={{ gridRow: `span ${span}` }}
       >
-        {/* BACKGROUND */}
         <div className="work-card-bg" />
-
-        {/* OVERLAY */}
         <div className={overlayClass} />
 
-        {/* CARD */}
         <div
           className="work-card group cursor-pointer"
           {...tapHandlers}
         >
-          {/* SHARE BUTTON */}
+          {/* SHARE BUTTON - REMOVER 
           {isOwner && (
             <button
               onClick={(e) => {
@@ -170,7 +176,7 @@ export function WorkCard({ work, isOwner, username }: WorkCardProps) {
             </button>
           )}
 
-          {/* MENU BUTTON */}
+          {/* MENU BUTTON - REMOVER
           {isOwner && (
             <button
               onClick={(e) => {
@@ -182,12 +188,11 @@ export function WorkCard({ work, isOwner, username }: WorkCardProps) {
             >
               ⋯
             </button>
-          )}
+          )} */}
 
           {/* TOP */}
           <div className="card-top max-w-[60%]">
             <h2 className="card-title">{work.title}</h2>
-
             <div className="card-type">
               {formatType(work.type)}
             </div>
@@ -198,7 +203,6 @@ export function WorkCard({ work, isOwner, username }: WorkCardProps) {
             <span className="card-muted">
               {"★".repeat(work.rating ?? 0)}
             </span>
-
             <span className="card-muted">
               {formatStatus(work.status, work.type)}
             </span>
@@ -215,6 +219,26 @@ export function WorkCard({ work, isOwner, username }: WorkCardProps) {
           />
         )}
       </div>
+
+      {/* SOFT CARD (🔥 FORA DO CONTAINER) */}
+      <SoftCard
+        open={openSoft}
+        onClose={() => setOpenSoft(false)}
+        work={work}
+        isOwner={isOwner}
+        onShare={() => {
+          setOpenSoft(false);
+          setOpenShare(true);
+        }}
+        onEdit={() => {
+          setOpenSoft(false);
+          setOpenEdit(true);
+        }}
+        onDelete={() => {
+          setOpenSoft(false);
+          setOpenDelete(true);
+        }}
+      />
 
       {/* MODALS */}
       <DeleteConfirmModal

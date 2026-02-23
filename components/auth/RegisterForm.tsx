@@ -74,7 +74,7 @@ export function RegisterForm({ onSuccess }: Props) {
   }
 
   if (usernameStatus === "taken") {
-    setError("Username já está em uso - Register");
+    setError("Username já está em uso");
     setLoading(false);
     return;
   }
