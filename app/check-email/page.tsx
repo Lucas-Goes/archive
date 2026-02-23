@@ -7,7 +7,7 @@ export default function CheckEmailPage() {
         </h1>
 
         <p className="text-white/40">
-          Enviamos um link de confirmação. Clique nele para ativar sua conta.
+          Enviamos um link de confirmação. Clique nele para ativar seu Archive.
         </p>
 
         <p className="text-white/20 text-sm">
