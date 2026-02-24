@@ -21,7 +21,7 @@ export function Footer({ username }: FooterProps) {
         className="text-sm opacity-70"
         style={{ color: "var(--text)" }}
       >
-        archive.app/{username}
+        archive-me.com/{username}
       </span>
     </div>
   );

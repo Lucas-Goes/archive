@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { ShareCard } from "@/components/share/ShareCard";
 import { themes, ThemeName } from "./themes";
 import { AnimatePresence, motion } from "framer-motion";
@@ -15,31 +15,6 @@ type Props = {
   rating?: number;
 };
 
-function getHeadlineParts(status: string, type: string) {
-  const isGame = type === "game";
-  const isReading = type === "book" || type === "hq" || type === "manga";
-
-  if (status === "want") {
-    if (isGame) return ["Quero", "jogar"];
-    if (isReading) return ["Quero", "ler"];
-    return ["Quero", "assistir"];
-  }
-
-  if (status === "in_progress") {
-    if (isGame) return ["Estou", "jogando"];
-    if (isReading) return ["Estou", "lendo"];
-    return ["Estou", "assistindo"];
-  }
-
-  if (status === "finished") {
-    if (isGame) return ["Acabei de", "finalizar"];
-    if (isReading) return ["Acabei de", "ler"];
-    return ["Acabei de", "ver"];
-  }
-
-  return ["", ""];
-}
-
 export function ShareModal({
   open,
   onClose,
@@ -49,7 +24,6 @@ export function ShareModal({
   type,
   rating,
 }: Props) {
-  const cardRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
   const themeList = Object.keys(themes) as ThemeName[];
@@ -58,6 +32,52 @@ export function ShareModal({
 
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
+
+  // -------------------------
+  // TRAVAR SCROLL
+  // -------------------------
+  useEffect(() => {
+    if (!open) return;
+
+    const scrollY = window.scrollY;
+
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      const y = document.body.style.top;
+
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.overflow = "";
+
+      window.scrollTo(0, parseInt(y || "0") * -1);
+    };
+  }, [open]);
+
+  // -------------------------
+  // FECHAR COM ESC
+  // -------------------------
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    }
+
+    if (open) {
+      window.addEventListener("keydown", handleKey);
+    }
+
+    return () => {
+      window.removeEventListener("keydown", handleKey);
+    };
+  }, [open, onClose]);
 
   if (!open) return null;
 
@@ -107,7 +127,7 @@ export function ShareModal({
           });
 
           return;
-        } catch (e) {
+        } catch {
           console.log("share cancelado");
         }
       }
@@ -156,30 +176,27 @@ export function ShareModal({
         background: "rgba(0,0,0,0.7)",
         backdropFilter: "blur(16px)",
       }}
-      onClick={onClose}
+      onMouseDown={onClose} // 👈 FECHA AO CLICAR FORA
     >
-
-
-      {/* CONTENT */}
       <div
-        className="flex flex-col items-center gap-4"
-        onClick={(e) => e.stopPropagation()}
+        className="scale-[0.75] origin-center"
+        onMouseDown={(e) => e.stopPropagation()} // 👈 IMPEDE FECHAR DENTRO
       >
-        {/* WRAPPER ÚNICO */}
-        <div className="flex flex-col items-center gap-4">
-
+        {/* CONTAINER DO CARD */}
+        <div className="w-full">
+          
           {/* CARD */}
-          <div className="w-full">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={theme}
-                onTouchStart={handleTouchStart}
-                onTouchEnd={handleTouchEnd}
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96 }}
-                transition={{ duration: 0.25 }}
-              >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={theme}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              <div className="w-full">
                 <ShareCard
                   title={title}
                   username={username}
@@ -188,77 +205,97 @@ export function ShareModal({
                   rating={rating}
                   theme={theme}
                 />
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* CONTROLS */}
-          <div className="relative w-full flex items-center">
-
-            {/* LEFT */}
-            <button
-              onClick={() =>
-                setThemeIndex((prev) =>
-                  prev === 0 ? themeList.length - 1 : prev - 1
-                )
-              }
+              </div>
+            </motion.div>
+          </AnimatePresence>
+          
+          <div className="w-full mt-15">
+            {/* CONTROLES */}
+            <div
               className="
-                z-10
-                w-10 h-10
-                rounded-full
-                flex items-center justify-center
-                bg-white/10 backdrop-blur-md
-                text-white
-                transition
-                hover:bg-white/20
+                absolute
+                bottom-3
+                left-1/2
+                -translate-x-1/2
+                w-[85%]
+                flex items-center
+                justify-between
+                gap-1
+                z-20
               "
             >
-              ←
-            </button>
+              {/* LEFT */}
+              <button
+                onClick={() =>
+                  setThemeIndex((prev) =>
+                    prev === 0 ? themeList.length - 1 : prev - 1
+                  )
+                }
+                className="
+                  w-9 h-9
+                  rounded-full
+                  flex items-center justify-center
+                  backdrop-blur-xl
+                  transition
+                  hover:opacity-70
+                "
+                style={{
+                  background: "var(--footer-bg)",
+                  color: "var(--text)",
+                  border: "1px solid var(--border)",
+                }}
+              >
+                ←
+              </button>
 
-            {/* CENTER */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              {/* SHARE */}
               <button
                 onClick={handleShare}
                 disabled={isExporting}
                 className="
-                  pointer-events-auto
-                  px-20 py-2.5
+                  flex-1
+                  mx-2
+                  py-2
                   rounded-xl
-                  border border-white/10
-                  bg-white/5
+                  backdrop-blur-xl
                   text-sm
-                  backdrop-blur-md
                   transition
-                  hover:bg-white/10
                   disabled:opacity-50
+                  hover:opacity-70
                 "
+                style={{
+                  background: "var(--footer-bg)",
+                  color: "var(--text)",
+                  border: "1px solid var(--border)",
+                }}
               >
                 {isExporting ? "Gerando..." : "Compartilhar"}
               </button>
+
+              {/* RIGHT */}
+              <button
+                onClick={() =>
+                  setThemeIndex((prev) =>
+                    prev === themeList.length - 1 ? 0 : prev + 1
+                  )
+                }
+                className="
+                  w-9 h-9
+                  rounded-full
+                  flex items-center justify-center
+                  backdrop-blur-xl
+                  transition
+                  hover:opacity-70
+                "
+                style={{
+                  background: "var(--footer-bg)",
+                  color: "var(--text)",
+                  border: "1px solid var(--border)",
+                }}
+              >
+                →
+              </button>
             </div>
-
-            {/* RIGHT */}
-            <button
-              onClick={() =>
-                setThemeIndex((prev) =>
-                  prev === themeList.length - 1 ? 0 : prev + 1
-                )
-              }
-              className="
-                ml-auto z-10
-                w-10 h-10
-                rounded-full
-                flex items-center justify-center
-                bg-white/10 backdrop-blur-md
-                text-white
-                transition
-                hover:bg-white/20
-              "
-            >
-              →
-            </button>
-
           </div>
         </div>
       </div>

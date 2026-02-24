@@ -313,7 +313,7 @@ export default function AboutPage() {
 
             {visible.every(Boolean) && (
              <div
-                className={`mt-20 flex items-baseline gap-4 transition-all duration-[5000ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                className={`mt-10 flex items-baseline gap-4 transition-all duration-[5000ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
                   showEnd
                     ? "opacity-100 blur-0 translate-y-0"
                     : "opacity-0 blur-[20px] translate-y-6"
