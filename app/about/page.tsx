@@ -244,7 +244,7 @@ export default function AboutPage() {
 
   return (
     <main
-      className="min-h-[100dvh] bg-black text-white relative overflow-hidden"
+      className="min-h-[100dvh] bg-black text-white relative overflow-hidden select-none"
       onMouseMove={handleMove}
       onClick={handleClick}
       onTouchStart={handleTouchStart}
@@ -276,10 +276,10 @@ export default function AboutPage() {
       <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12">
         <header className="flex items-center justify-between py-5">
           <div className="flex items-center gap-6">
-            <Link href="/" className="text-sm text-white/80 hover:text-white transition">
+            <Link href="/" className="text-sm text-white/30 hover:text-white transition">
               Archive
             </Link>
-            <span className="text-sm text-white/30">Sobre</span>
+            <span className="text-sm text-white/80">Sobre</span>
           </div>
 
           <Link
@@ -364,6 +364,25 @@ export default function AboutPage() {
         .animate-core {
           animation: core 2s ease-in-out infinite;
         }
+
+      * {
+        -webkit-touch-callout: none;
+      }
+
+      * {
+
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    * {
+  -webkit-tap-highlight-color: transparent;
+}
+
+<main
+  style={{ touchAction: "manipulation" }}
+
       `}</style>
     </main>
   );
