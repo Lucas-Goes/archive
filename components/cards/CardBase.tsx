@@ -42,13 +42,23 @@ export function CardBase({ work, showActions, onMenuClick }: Props) {
             absolute top-8 right-8 z-20
             w-8 h-8
             flex items-center justify-center
-            rounded-full
+            rounded-[30%]
             backdrop-blur-md
             border border-gray-400
             text-sm
             "
+            style={{
+              background: "var(--footer-bg)",
+              color: "var(--text)",
+              border: "1px solid var(--border)",
+            }}
+
       >
-          ⋯
+          <div className="flex gap-[3px]">
+            <span className="w-1 h-1 rounded-full bg-current" />
+            <span className="w-1 h-1 rounded-full bg-current" />
+            <span className="w-1 h-1 rounded-full bg-current" />
+          </div>
       </button>
       )}
 
