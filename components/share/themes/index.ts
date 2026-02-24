@@ -1,6 +1,7 @@
 import type { FontName } from "../fonts";
 import { DarkTheme } from "./dark";
 import { LightTheme } from "./light";
+import { Vision1Theme } from "./vision1";
 
 
 export const themes = {
@@ -11,6 +12,10 @@ export const themes = {
   dark: {
     component: DarkTheme,
     font: "inter" as FontName,
+  },
+   vision1: {
+    component: Vision1Theme,
+    font: "lexend" as FontName,
   },
 };
 

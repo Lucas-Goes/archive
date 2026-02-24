@@ -103,7 +103,7 @@ export function ShareCard({
         renderStars={renderStars}
         font={font}
       />
-    </div>
+    </div> 
   );
 }
 

@@ -119,7 +119,7 @@ export function DarkTheme({
             </h2>
           </div>
 
-          <p className="text-xs text-right" style={{ 
+          <p className="text-xs text-right mt-1.5" style={{ 
             fontFamily: 'sans-serif', 
             fontStyle: 'italic',
             color: 'rgba(255,255,255,0.4)',
